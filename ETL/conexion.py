@@ -28,24 +28,18 @@ def obtener_conexion():
     except Exception as e:
         print(f"Error al conectar: {e}")
         return None
-
-def extraer_datos():
-    engine = obtener_conexion()
-    if engine:
-        try:
-            query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'"
-            df = pd.read_sql(query, engine)
-            print("///////////////////////////////////////////////////////////////////")
-            print("SE BIENVENIDO A NUESTRO ETL")
-            print("Porfavor indica el numero de tabla de la cual deseas extraer los datos---------> \n")
-            print(df.head())
-            
-            data_conversion(engine)
-            
-        except Exception as e:
-            print(f"Error al extraer los datos de la tabla de origen:{e}")
-        finally:
-            engine.dispose()
-        
-        return df
     
+
+def conexion():
+    # 1. Obtenemos el motor (pide contraseña aquí)
+    engine = obtener_conexion() 
+    database = 'BD_CAFETERIA'
+    
+    if engine:
+        print("\n=======================================================")
+        print("\n           SE BIENVENIDO A NUESTRO ETL                   ")
+        print(f"\n    Estas conectado a la Base de Datos: {database}    ")
+        
+        return engine  
+    else:
+        return None
