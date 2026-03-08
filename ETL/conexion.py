@@ -1,6 +1,8 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
+from data_conversion import data_conversion
+
 def obtener_conexion():
     try:
         server = 'localhost,1433' 
@@ -37,10 +39,13 @@ def extraer_datos():
             print("SE BIENVENIDO A NUESTRO ETL")
             print("Porfavor indica el numero de tabla de la cual deseas extraer los datos---------> \n")
             print(df.head())
-            TABLA = int(input("\nIndica el numero de la tabla que deseas: "))
+            
+            data_conversion(engine)
+            
         except Exception as e:
             print(f"Error al extraer los datos de la tabla de origen:{e}")
         finally:
             engine.dispose()
+        
         return df
     
