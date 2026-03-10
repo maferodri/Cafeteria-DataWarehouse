@@ -1,10 +1,8 @@
 import pandas as pd
 
-import pandas as pd
-
 def extraccion(engine):
-    print("\n============================================================")
-    print("     PASO 1: EXTRACCIÓN DE LOS DATOS       ")
+    print("\n==============================================================")
+    print("            PASO 1: EXTRACCIÓN DE LOS DATOS            ")
     print("==============================================================")
 
     while True: 
@@ -15,20 +13,41 @@ def extraccion(engine):
         opcion = input("\nSelecciona una opción (1 o 2): ").strip()
 
         if opcion == '2':
-            query = input("Introduce tu consulta SQL: ")
-            try:
-                df = pd.read_sql(query, engine)
-                print("Datos extraídos exitosamente.")
-                print(f"\n {df.head()}")
-                datos = len(df)
-                print(f"\nLa cantidad de datos obtenidos fueron: {datos}")
-                return df 
-            except Exception as e: 
-                print(f"Error en la consulta: {e}")
+            while True: 
+                query_tables = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'"
+                tablas_df = pd.read_sql(query_tables, engine)
+                
+                print("\nLas tablas con sus campos son: ")
+
+                for tabla in tablas_df['TABLE_NAME']:
+                    query_columns = f"""
+                        SELECT COLUMN_NAME 
+                        FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_NAME = '{tabla}'
+                    """
+                    columnas_df = pd.read_sql(query_columns, engine)
+                    lista_campos = ", ".join(columnas_df['COLUMN_NAME'].tolist())
+                    print(f"\n TABLA: {tabla} -> CAMPOS: {lista_campos}")
+
+
+                query = input("Introduce tu consulta SQL: ")
+                try:
+                    df = pd.read_sql(query, engine)
+
+                    if not df.empty:
+                        print("\nDatos extraídos exitosamente. Los primeros 5 fueron: ")
+                        print(f"\n {df.head()}")
+                        datos = len(df)
+                        print(f"\nLa cantidad de datos obtenidos fueron: {datos}")
+                        return df 
+                    else: 
+                        print("\nLa consulta no devolvio ningun resultado. Verifique la consulta e intente nuevamente")
+
+                except Exception as e: 
+                    print(f"\nError en la consulta: {e}")
             
         elif opcion == '1':
             try: 
-                # 1. Obtener lista de tablas
                 query_tables = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'"
                 tablas_df = pd.read_sql(query_tables, engine)
                 lista_tablas = tablas_df['TABLE_NAME'].tolist()
@@ -36,7 +55,6 @@ def extraccion(engine):
                 print("\nTablas disponibles: ")
                 print(tablas_df['TABLE_NAME'].to_string(index=False))
                 
-                # --- CICLO PARA VALIDAR TABLA ---
                 while True: 
                     tabla_seleccionada = input("\nEscribe el nombre de la tabla: ").strip()
                     if tabla_seleccionada in lista_tablas:
@@ -44,26 +62,38 @@ def extraccion(engine):
                         columnas = pd.read_sql(query_cols, engine).columns.tolist()
                         break 
                     else:
-                        print(f"La tabla '{tabla_seleccionada}' no es válida.")
+                        print(f"\nLa tabla '{tabla_seleccionada}' no es válida. Intente nuevamente")
 
-                # --- CICLO PARA VALIDAR CAMPOS ---
+                print(f"\nCampos disponibles en '{tabla_seleccionada}':")
+                print(", ".join(columnas))
+
                 while True:
-                    print(f"\nCampos disponibles en '{tabla_seleccionada}':")
-                    print(", ".join(columnas))
+                    entrada_campos = input("\nEscribe los campos (separados por coma) o '*' para todos: ").strip()
+
+                    if entrada_campos == '*':
+                        campos_validados = '*'
+                        break
+
+                    lista_seleccionada = [c.strip() for c in entrada_campos.split(',')]
+                    campos_invalidos = [c for c in lista_seleccionada if c not in columnas]
+
+                    if not campos_invalidos: 
+                        campos_validados = ", ".join(lista_seleccionada)
+                        break
+                    else: 
+                        print(f"\nError: Los siguientes campos no existen: {', '.join(campos_invalidos)}")
                     
-                    campos = input("\nEscribe los campos (separados por coma) o '*' para todos: ").strip()
+                try:
+                    query_final = f"SELECT {entrada_campos} FROM {tabla_seleccionada}"
+                    df = pd.read_sql(query_final, engine)
+                    print(f"\nDatos de '{tabla_seleccionada}' extraídos exitosamente. Los primeros 5 datos: ")
+                    print(f"\n {df.head()}")
+                    datos = len(df)
+                    print(f"\nLa cantidad de datos obtenidos fueron: {datos}")
+                    return df 
                     
-                    try:
-                        query_final = f"SELECT {campos} FROM {tabla_seleccionada}"
-                        df = pd.read_sql(query_final, engine)
-                        print(f"Datos de '{tabla_seleccionada}' extraídos exitosamente. Los primeros 5 datos: ")
-                        print(f"\n {df.head()}")
-                        datos = len(df)
-                        print(f"\nLa cantidad de datos obtenidos fueron: {datos}")
-                        return df # Retornamos el DataFrame final
-                    
-                    except Exception as e:
-                        print(f"Error en los campos: {e}. Intenta de nuevo.")
+                except Exception as e:
+                    print(f"/nError en los campos: {e}. Intenta de nuevo.")
 
             except Exception as e:
                 print(f"Error general: {e}")
