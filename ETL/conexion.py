@@ -1,7 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
-from data_conversion import data_conversion
+from data_conversion import menu_conversion
 
 def obtener_conexion():
     try:
@@ -32,20 +32,30 @@ def obtener_conexion():
 def extraer_datos():
     engine = obtener_conexion()
     if engine:
-        try:
-            query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'"
-            df = pd.read_sql(query, engine)
-            print("///////////////////////////////////////////////////////////////////")
-            print("SE BIENVENIDO A NUESTRO ETL")
-            print("Porfavor indica el numero de tabla de la cual deseas extraer los datos---------> \n")
-            print(df.head())
+        # try:
+        #     query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'"
+        #     df = pd.read_sql(query, engine)
+        #     print("///////////////////////////////////////////////////////////////////")
+        #     print("SE BIENVENIDO A NUESTRO ETL")
+        #     print("Porfavor indica el numero de tabla de la cual deseas extraer los datos---------> \n")
+        #     print(df.head())
             
-            data_conversion(engine)
+        #     data_conversion(engine)
             
-        except Exception as e:
-            print(f"Error al extraer los datos de la tabla de origen:{e}")
-        finally:
-            engine.dispose()
+        # except Exception as e:
+        #     print(f"Error al extraer los datos de la tabla de origen:{e}")
+        # finally:
+        #     engine.dispose()
+        
+        query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'"
+        df = pd.read_sql(query, engine)
+        print("///////////////////////////////////////////////////////////////////")
+        print("SE BIENVENIDO A NUESTRO ETL")
+        print("Porfavor indica el numero de tabla de la cual deseas extraer los datos---------> \n")
+        print(df.head())
+            
+        menu_conversion(engine)
+        
         
         return df
     
