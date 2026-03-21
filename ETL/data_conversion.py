@@ -1,35 +1,244 @@
 import pandas as pd
+import re
 
-def data_conversion (engine) :
+from pandas.api.types import is_datetime64_any_dtype
+
+def menu_conversion (engine):
     query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'"
     df = pd.read_sql(query, engine)
-    
-    #table_num = int(input("\nIndica el numero de la tabla que deseas: "))
-    table_name = df.iloc[0]['TABLE_NAME']
+    table_name = df.iloc[4]['TABLE_NAME']
             
     table_query = f"SELECT * FROM {table_name}"
             
     table_df = pd.read_sql(table_query, engine)
+    table_original = table_df.columns.tolist()
+    
+    data_conversion(engine, table_df, table_original)
+    
+    
+    
+
+def data_conversion (engine, table_df, table_original) :
+    
+    
     print('\nEjemplo de los primeros 5 registros de la tabla seleccionada')
     print(table_df.head()) 
     
-    
     print("\n//////// BIENVENIDO AL DATA CONVERSION /////////////// \n")
-    print("\nBien!! Ahora que cambio le quieres hacer? Selecciona el numero")
-    print("\n1: Convertir a Minuscula")
-    print("2: Convertir a Mayuscula")
-    print("3: Obtener parte de fecha")
-    print("4: Concatenar Campos")
     
-    opt = input("\nSelecciona un numero: ")
+    while True:
+        print("\nBien!! Ahora que cambio le quieres hacer? Selecciona el numero")
+        print("\n1: Convertir a Minuscula")
+        print("2: Convertir a Mayuscula")
+        print("3: Obtener parte de fecha")
+        print("4: Concatenar Campos")
+        print("5: Eliminar Columna")
+        print("6: Vista Previa de las tablas")
+        print("7: Salir del menu de tablas")
+        
+        opt = input("\nSelecciona un numero: ")
+        
+        if opt == "1":
+            conversion_minuscula(engine, table_df, table_original)
+            break;
+        elif opt == "2":
+            conversion_mayuscula(engine, table_df, table_original)
+            break;
+        elif opt == "3":
+            extraer_fecha(engine, table_df, table_original)
+            break;
+        elif opt == "4":
+            concatenar_campos(engine, table_df, table_original)
+            break;
+        elif opt == "5":
+            eliminar_campo(engine, table_df, table_original)
+            break;
+        elif opt == "6":
+            print("Vista Previa de toda la tabla")
+            print(table_df.head())
+        elif opt == "7":
+            #Menu de las tablas
+            print("")
+        else:
+            print("No esta dentro de las opciones mencionadas")
     
     
-    print("\nPorfavor seleccione el numero y la columna que desea editar")
     
+    
+    
+    
+def conversion_minuscula (engine, table_df, table_original):
+    print("\nPorfavor seleccione el numero de la columna que desea editar")
     columnas = table_df.columns.tolist()
-    
     print("----------------Columnas ------->")
     for column in columnas:
         print(column) 
     
-    column_conversion = input("Nombre de la columna: ")
+    while True:
+        column_conversion = input("\nNombre de la columna: ")
+        if column_conversion in table_original:
+            if table_df[column_conversion].dtype != "str":
+                print("La columna seleccionada no es un tipo de dato admitido")
+                return;
+            else:
+                break;
+        else:
+            print("La columna no existe")
+    
+    while True:
+        column_add = input("Escriba el nombre de la nueva tabla en donde se guardaran los datos: ")
+        if column_add in table_original:
+            print("Ya existe una tabla con ese nombre")
+        else:
+            break;
+    
+    table_df[column_add] = ""
+    table_df[column_add] = table_df[column_conversion].str.lower()
+    
+    data_conversion(engine, table_df, table_original)
+
+
+
+def conversion_mayuscula (engine, table_df, table_original):
+    print("\nPorfavor seleccione el numero de la columna que desea editar")
+    columnas = table_df.columns.tolist()
+    print("----------------Columnas ------->")
+    for column in columnas:
+        print(column) 
+    
+    while True:
+        column_conversion = input("\nNombre de la columna: ")
+        if column_conversion in table_original:
+            if table_df[column_conversion].dtype != "str":
+                print("La columna seleccionada no es un tipo de dato admitido")
+                return;
+            else:
+                break;
+        else:
+            print("La columna no existe")
+    
+    while True:
+        column_add = input("Escriba el nombre de la nueva tabla en donde se guardaran los datos: ")
+        if column_add in table_original:
+            print("Ya existe una tabla con ese nombre")
+        else:
+            break;
+    
+    table_df[column_add] = ""
+    table_df[column_add] = table_df[column_conversion].str.upper()
+    
+    data_conversion(engine, table_df, table_original)
+
+
+
+def extraer_fecha (engine, table_df, table_original):
+    print("\nPorfavor seleccione el numero y la columna que desea editar")
+    columnas = table_df.columns.tolist()
+    print("----------------Columnas ------->")
+    for column in columnas:
+        print(column) 
+    
+    while True:
+        column_conversion = input("\nNombre de la columna: ")
+        insert_conversion = column_conversion
+        is_date_time = pd.to_datetime(table_df[column_conversion], errors='coerce', format='mixed').notna().all()
+        
+        if column_conversion in table_original:
+            if not (is_date_time):
+                print("La columna seleccionada no es un tipo de dato admitido")
+            else:
+                if table_df[column_conversion].dtype == "str":
+                    insert_conversion = "DT_" + column_conversion
+                    print("El campo seleccionado no es una fecha, pero se creara una columna para ser usada")
+                    print("Nombre de la nueva columna: " + insert_conversion)
+                break;
+        else:
+            print("La columna no existe, vuelva a ingresar el nombre de la columna")
+    
+    table_df[insert_conversion] = pd.to_datetime(table_df[column_conversion], format='mixed')
+    
+    print("\nQue desea obtener de la fecha?")
+    print("1. Año")
+    print("2. Mes")
+    print("3. Dia")
+    print("4. hora")
+    print("5. AM o PM")
+    
+    opciones = ["1", "2", "3", "4", "5"]
+    
+    while True:
+        opt = input("\nSelecciona un numero: ")
+        if opt not in opciones:
+            print("No esta dentro de las opciones")
+        else:
+            break
+    
+    print("\nElige la nueva columna donde se ingresara el dato")
+    print("----Columnas Existentes")
+    for column in columnas:
+        print(column) 
+    
+    while True:
+        column_date = input("Ingresa el de la nueva columna: ")
+        if column_date in table_original:
+            print("La columna ya existe")
+        else:
+            break
+    
+    if opt == "1":
+        table_df[column_date] = table_df[insert_conversion].dt.year
+    elif opt == "2":
+        table_df[column_date] = table_df[insert_conversion].dt.month_name()
+    elif opt == "3":
+        table_df[column_date] = table_df[insert_conversion].dt.day
+    elif opt == "4":
+        table_df[column_date] = table_df[insert_conversion].dt.hour
+    elif opt == "5":
+        table_df[column_date] = table_df.apply(lambda x: "AM" if x[insert_conversion].hour < 12 else "PM", axis=1)
+    
+    data_conversion(engine, table_df, table_original)
+
+
+
+def concatenar_campos (engine, table_df, table_original):
+    print("Porfavor en un ingresa la concatenacion deseada y mete dentro de corchetes [] la tabla deseada")
+    print("----------------Columnas Disponibles ------->")
+    for column in table_original:
+        print(column) 
+    concatenacion = input("Ingresala aqui: ")
+    text_concat = re.split(r"(?=\[)|(?<=\])", concatenacion)
+    column_insert_concat = input("\nIngresa el nombre de la nueva tabla en donde se agregara: ")
+    
+    for column in table_original:
+        if column == column_insert_concat:
+            print("La columna ya esta dentro de la base de datos")
+    
+    table_df[column_insert_concat] = ""
+    for part in text_concat:
+        if "[" in part and "]" in part:
+            column_exist = part.replace("[", "").replace("]","")
+            table_df[column_insert_concat] = table_df[column_insert_concat] + table_df[column_exist].astype(str)
+        else:
+            table_df[column_insert_concat] = table_df[column_insert_concat] + part    
+    
+    data_conversion(engine, table_df, table_original)
+
+
+
+def eliminar_campo(engine, table_df, table_original):
+    print("/////ELIMINAR UNA COLUMNA O CAMPO")
+    print("\nColumnas Disponibles a eliminar")
+    columnas_originales = table_original.columns.tolist()
+    columnas = table_df.columns.tolist()
+    for columna in columnas:
+        if (columna not in columnas_originales):
+            print(columna)
+    while True:
+        column_delete = input("Seleccciona la columna que sera eliminada: ")
+        if column_delete not in columnas or column_delete in columnas_originales:
+            print("La columna no existe o no puede ser cambiada")   
+        else: 
+            break 
+    
+    data_conversion(engine, table_df, table_original)
+    
