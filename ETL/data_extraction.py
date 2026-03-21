@@ -1,6 +1,8 @@
 import pandas as pd
 
-def extraccion(engine):
+engine_oltp = 'BD_CAFETERIA'
+
+def extraccion(engine_oltp):
     print("\n==============================================================")
     print("            PASO 1: EXTRACCIÓN DE LOS DATOS            ")
     print("==============================================================")
@@ -16,13 +18,16 @@ def extraccion(engine):
         if opcion == '2':
             while True: 
                 query_tables = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'"
-                tablas_df = pd.read_sql(query_tables, engine)
+                tablas_df = pd.read_sql(query_tables, engine_oltp)
 
                 print("\n==============================================================")
                 print("            CONSULTA SQL PERSONALIZADA            ")
                 print("==============================================================")
 
-                volver = input("Si deseas volver al menu principal presiona 0, de lo contrario cualquier tecla: ")
+                print("\nOpciones: ")
+                print("0. Menú Principal")
+
+                volver = input("\nSi deseas volver al menu principal presiona 0, de lo contrario cualquier tecla: ")
 
                 if volver == '0':
                     break
@@ -35,14 +40,14 @@ def extraccion(engine):
                         FROM INFORMATION_SCHEMA.COLUMNS 
                         WHERE TABLE_NAME = '{tabla}'
                     """
-                    columnas_df = pd.read_sql(query_columns, engine)
+                    columnas_df = pd.read_sql(query_columns, engine_oltp)
                     lista_campos = ", ".join(columnas_df['COLUMN_NAME'].tolist())
                     print(f"\n TABLA: {tabla} -> CAMPOS: {lista_campos}")
 
 
-                query = input("Introduce tu consulta SQL: ")
+                query = input("\nIntroduce tu consulta SQL: ")
                 try:
-                    df = pd.read_sql(query, engine)
+                    df = pd.read_sql(query, engine_oltp)
 
                     if not df.empty:
                         print("\nDatos extraídos exitosamente. Los primeros 5 fueron: ")
@@ -60,26 +65,30 @@ def extraccion(engine):
             while True:
                 try: 
                     query_tables = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'"
-                    tablas_df = pd.read_sql(query_tables, engine)
+                    tablas_df = pd.read_sql(query_tables, engine_oltp)
                     lista_tablas = tablas_df['TABLE_NAME'].tolist()
 
                     print("\n==============================================================")
                     print("            SELECCIONAR TABLA DE LA BASE DE DATOS            ")
                     print("==============================================================")
 
+                    print("\nOpciones: ")
+                    print("0. Menú Principal")
+
                     volver = input("Si deseas volver al menu principal presiona 0, de lo contrario cualquier tecla: ")
 
                     if volver == '0':
                         break
 
-                    print("\nTablas disponibles: ")
-                    print(tablas_df['TABLE_NAME'].to_string(index=False))
+                    print("\nTablas disponibles en BD OLTP:")
+                    for i, tabla in enumerate(lista_tablas, 1):
+                        print(f"{i}. {tabla}")
                     
                     while True: 
                         tabla_seleccionada = input("\nEscribe el nombre de la tabla: ").strip()
                         if tabla_seleccionada in lista_tablas:
                             query_cols = f"SELECT TOP 0 * FROM {tabla_seleccionada}"
-                            columnas = pd.read_sql(query_cols, engine).columns.tolist()
+                            columnas = pd.read_sql(query_cols, engine_oltp).columns.tolist()
                             break 
                         else:
                             print(f"\nLa tabla '{tabla_seleccionada}' no es válida. Intente nuevamente")
@@ -105,7 +114,7 @@ def extraccion(engine):
                         
                     try:
                         query_final = f"SELECT {entrada_campos} FROM {tabla_seleccionada}"
-                        df = pd.read_sql(query_final, engine)
+                        df = pd.read_sql(query_final, engine_oltp)
                         print(f"\nDatos de '{tabla_seleccionada}' extraídos exitosamente. Los primeros 5 datos: ")
                         print(f"\n {df.head()}")
                         datos = len(df)
