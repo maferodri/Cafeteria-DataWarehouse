@@ -49,10 +49,10 @@ def extraer_datos():
         
         query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'"
         df = pd.read_sql(query, engine)
-        print("///////////////////////////////////////////////////////////////////")
-        print("SE BIENVENIDO A NUESTRO ETL")
-        print("Porfavor indica el numero de tabla de la cual deseas extraer los datos---------> \n")
-        print(df.head())
+        # print("///////////////////////////////////////////////////////////////////")
+        # print("SE BIENVENIDO A NUESTRO ETL")
+        # print("Porfavor indica el numero de tabla de la cual deseas extraer los datos---------> \n")
+        # print(df.head())
             
         menu_conversion(engine)
         
