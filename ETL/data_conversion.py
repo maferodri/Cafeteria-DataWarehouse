@@ -3,22 +3,22 @@ import re
 
 from pandas.api.types import is_datetime64_any_dtype
 
-def menu_conversion (engine):
-    query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'"
-    df = pd.read_sql(query, engine)
-    table_name = df.iloc[4]['TABLE_NAME']
+# def menu_conversion (engine):
+#     query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'"
+#     df = pd.read_sql(query, engine)
+#     table_name = df.iloc[4]['TABLE_NAME']
             
-    table_query = f"SELECT * FROM {table_name}"
+#     table_query = f"SELECT * FROM {table_name}"
             
-    table_df = pd.read_sql(table_query, engine)
-    table_original = table_df.columns.tolist()
+#     table_df = pd.read_sql(table_query, engine)
+#     table_original = table_df.columns.tolist()
     
-    data_conversion(engine, table_df, table_original)
+#     data_conversion(engine, table_df, table_original)
     
     
     
 
-def data_conversion (engine, table_df, table_original) :
+def data_conversion (table_df, table_original) :
     
     
     print('\nEjemplo de los primeros 5 registros de la tabla seleccionada')
@@ -34,31 +34,30 @@ def data_conversion (engine, table_df, table_original) :
         print("4: Concatenar Campos")
         print("5: Eliminar Columna")
         print("6: Vista Previa de las tablas")
-        print("7: Salir del menu de tablas")
+        print("7: Salir del Menu Conversion")
         
         opt = input("\nSelecciona un numero: ")
         
         if opt == "1":
-            conversion_minuscula(engine, table_df, table_original)
+            conversion_minuscula(table_df, table_original)
             break;
         elif opt == "2":
-            conversion_mayuscula(engine, table_df, table_original)
+            conversion_mayuscula(table_df, table_original)
             break;
         elif opt == "3":
-            extraer_fecha(engine, table_df, table_original)
+            extraer_fecha(table_df, table_original)
             break;
         elif opt == "4":
-            concatenar_campos(engine, table_df, table_original)
+            concatenar_campos(table_df, table_original)
             break;
         elif opt == "5":
-            eliminar_campo(engine, table_df, table_original)
+            eliminar_campo(table_df, table_original)
             break;
         elif opt == "6":
             print("Vista Previa de toda la tabla")
             print(table_df.head())
         elif opt == "7":
-            #Menu de las tablas
-            print("")
+            return table_df
         else:
             print("No esta dentro de las opciones mencionadas")
     
@@ -67,7 +66,7 @@ def data_conversion (engine, table_df, table_original) :
     
     
     
-def conversion_minuscula (engine, table_df, table_original):
+def conversion_minuscula (table_df, table_original):
     print("\nPorfavor seleccione el numero de la columna que desea editar")
     columnas = table_df.columns.tolist()
     print("----------------Columnas ------->")
@@ -95,11 +94,11 @@ def conversion_minuscula (engine, table_df, table_original):
     table_df[column_add] = ""
     table_df[column_add] = table_df[column_conversion].str.lower()
     
-    data_conversion(engine, table_df, table_original)
+    data_conversion(table_df, table_original)
 
 
 
-def conversion_mayuscula (engine, table_df, table_original):
+def conversion_mayuscula (table_df, table_original):
     print("\nPorfavor seleccione el numero de la columna que desea editar")
     columnas = table_df.columns.tolist()
     print("----------------Columnas ------->")
@@ -127,11 +126,11 @@ def conversion_mayuscula (engine, table_df, table_original):
     table_df[column_add] = ""
     table_df[column_add] = table_df[column_conversion].str.upper()
     
-    data_conversion(engine, table_df, table_original)
+    data_conversion(table_df, table_original)
 
 
 
-def extraer_fecha (engine, table_df, table_original):
+def extraer_fecha (table_df, table_original):
     print("\nPorfavor seleccione el numero y la columna que desea editar")
     columnas = table_df.columns.tolist()
     print("----------------Columnas ------->")
@@ -196,11 +195,11 @@ def extraer_fecha (engine, table_df, table_original):
     elif opt == "5":
         table_df[column_date] = table_df.apply(lambda x: "AM" if x[insert_conversion].hour < 12 else "PM", axis=1)
     
-    data_conversion(engine, table_df, table_original)
+    data_conversion(table_df, table_original)
 
 
 
-def concatenar_campos (engine, table_df, table_original):
+def concatenar_campos (table_df, table_original):
     print("Porfavor en un ingresa la concatenacion deseada y mete dentro de corchetes [] la tabla deseada")
     print("----------------Columnas Disponibles ------->")
     for column in table_original:
@@ -221,7 +220,7 @@ def concatenar_campos (engine, table_df, table_original):
         else:
             table_df[column_insert_concat] = table_df[column_insert_concat] + part    
     
-    data_conversion(engine, table_df, table_original)
+    data_conversion(table_df, table_original)
 
 
 
@@ -240,5 +239,5 @@ def eliminar_campo(engine, table_df, table_original):
         else: 
             break 
     
-    data_conversion(engine, table_df, table_original)
+    data_conversion(table_df, table_original)
     
