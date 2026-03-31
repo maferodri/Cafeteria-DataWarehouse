@@ -85,40 +85,42 @@ def extraccion(engine_oltp):
                         print(f"{i}. {tabla}")
                     
                     while True: 
-                        tabla_seleccionada = input("\nEscribe el nombre de la tabla: ").strip()
-                        if tabla_seleccionada in lista_tablas:
+                        entrada = input("\nEscribe el número de la tabla: ").strip()
+                        if entrada.isdigit() and 1 <= int(entrada) <= len(lista_tablas):
+                            tabla_seleccionada = lista_tablas[int(entrada) - 1]
                             query_cols = f"SELECT TOP 0 * FROM {tabla_seleccionada}"
                             columnas = pd.read_sql(query_cols, engine_oltp).columns.tolist()
+                            print(f"\nTabla seleccionada: {tabla_seleccionada}")
                             break 
                         else:
-                            print(f"\nLa tabla '{tabla_seleccionada}' no es válida. Intente nuevamente")
+                            print(f"\nNúmero inválido. Ingresa un número entre 1 y {len(lista_tablas)}")
 
                     print(f"\nCampos disponibles en '{tabla_seleccionada}':")
-                    print(", ".join(columnas))
+                    for i, col in enumerate(columnas, 1):
+                        print(f"{i}. {col}")
 
                     while True:
-                        entrada_campos = input("\nEscribe los campos (separados por coma) o '*' para todos: ").strip()
+                        entrada_campos = input("\nEscribe los números de los campos (separados por coma) o '*' para todos: ").strip()
 
                         if entrada_campos == '*':
                             campos_validados = '*'
                             break
 
-                        lista_seleccionada = [c.strip() for c in entrada_campos.split(',')]
-                        campos_invalidos = [c for c in lista_seleccionada if c not in columnas]
+                        numeros = [n.strip() for n in entrada_campos.split(',')]
+                        todos_validos = all(n.isdigit() and 1 <= int(n) <= len(columnas) for n in numeros)
 
-                        if not campos_invalidos: 
-                            campos_validados = ", ".join(lista_seleccionada)
+                        if todos_validos:
+                            campos_validados = ", ".join(columnas[int(n) - 1] for n in numeros)
                             break
-                        else: 
-                            print(f"\nError: Los siguientes campos no existen: {', '.join(campos_invalidos)}")
+                        else:
+                            print(f"\nNúmero(s) inválido(s). Ingresa números entre 1 y {len(columnas)}")
                         
                     try:
-                        query_final = f"SELECT {entrada_campos} FROM {tabla_seleccionada}"
+                        query_final = f"SELECT {campos_validados} FROM {tabla_seleccionada}"
                         df = pd.read_sql(query_final, engine_oltp)
                         print(f"\nDatos de '{tabla_seleccionada}' extraídos exitosamente. Los primeros 5 datos: ")
                         print(f"\n {df.head()}")
-                        datos = len(df)
-                        print(f"\nLa cantidad de datos obtenidos fueron: {datos}")
+                        print(f"\nLa cantidad de datos obtenidos fueron: {len(df)}")
                         return df 
                         
                     except Exception as e:

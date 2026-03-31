@@ -1,5 +1,5 @@
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 def obtener_conexion(nombre_bd, password):
     try:
@@ -17,10 +17,15 @@ def obtener_conexion(nombre_bd, password):
         )
         connection_url = f"mssql+pyodbc:///?odbc_connect={connection_string}"
         engine = create_engine(connection_url)
+    
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+
+        print(f"Conexión a '{nombre_bd}' exitosa.")
         return engine
     
     except Exception as e:
-        print(f"Error al conectar: {e}")
+        print(f"Contraseña incorrecta o servidor no disponible.")
         return None
     
 
