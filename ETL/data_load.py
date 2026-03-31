@@ -46,7 +46,7 @@ def data_load(df_conv, table_destination, engine):
         print(f"{column_pair[i]}  ---->   {columns_destination[i]}")
             
     
-    df_conv.to_sql(
+    df_final.to_sql(
     name=table_destination,
     con=engine,
     schema='dbo',

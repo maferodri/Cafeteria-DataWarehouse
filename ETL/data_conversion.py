@@ -25,6 +25,9 @@ def data_conversion (table_df, table_original) :
     print(table_df.head()) 
     
     print("\n//////// BIENVENIDO AL DATA CONVERSION /////////////// \n")
+
+    #Forzar a cambiar los tipos de datos que se regreso de la DB
+    table_df = table_df.convert_dtypes()
     
     while True:
         print("\nBien!! Ahora que cambio le quieres hacer? Selecciona el numero")
@@ -39,20 +42,15 @@ def data_conversion (table_df, table_original) :
         opt = input("\nSelecciona un numero: ")
         
         if opt == "1":
-            conversion_minuscula(table_df, table_original)
-            break;
+            table_df = conversion_minuscula(table_df, table_original)
         elif opt == "2":
-            conversion_mayuscula(table_df, table_original)
-            break;
+            table_df = conversion_mayuscula(table_df, table_original)
         elif opt == "3":
-            extraer_fecha(table_df, table_original)
-            break;
+            table_df = extraer_fecha(table_df, table_original)
         elif opt == "4":
-            concatenar_campos(table_df, table_original)
-            break;
+            table_df = concatenar_campos(table_df, table_original)
         elif opt == "5":
-            eliminar_campo(table_df, table_original)
-            break;
+            table_df = eliminar_campo(table_df, table_original)
         elif opt == "6":
             print("Vista Previa de toda la tabla")
             print(table_df.head())
@@ -76,9 +74,9 @@ def conversion_minuscula (table_df, table_original):
     while True:
         column_conversion = input("\nNombre de la columna: ")
         if column_conversion in table_original:
-            if table_df[column_conversion].dtype != "str":
+            if table_df[column_conversion].dtype != "string":
                 print("La columna seleccionada no es un tipo de dato admitido")
-                return;
+                #return
             else:
                 break;
         else:
@@ -94,7 +92,7 @@ def conversion_minuscula (table_df, table_original):
     table_df[column_add] = ""
     table_df[column_add] = table_df[column_conversion].str.lower()
     
-    data_conversion(table_df, table_original)
+    return table_df
 
 
 
@@ -107,10 +105,11 @@ def conversion_mayuscula (table_df, table_original):
     
     while True:
         column_conversion = input("\nNombre de la columna: ")
+        
         if column_conversion in table_original:
-            if table_df[column_conversion].dtype != "str":
+            if table_df[column_conversion].dtype != "string":
                 print("La columna seleccionada no es un tipo de dato admitido")
-                return;
+                #return;
             else:
                 break;
         else:
@@ -126,7 +125,7 @@ def conversion_mayuscula (table_df, table_original):
     table_df[column_add] = ""
     table_df[column_add] = table_df[column_conversion].str.upper()
     
-    data_conversion(table_df, table_original)
+    return table_df
 
 
 
@@ -195,7 +194,7 @@ def extraer_fecha (table_df, table_original):
     elif opt == "5":
         table_df[column_date] = table_df.apply(lambda x: "AM" if x[insert_conversion].hour < 12 else "PM", axis=1)
     
-    data_conversion(table_df, table_original)
+    return table_df
 
 
 
@@ -220,7 +219,7 @@ def concatenar_campos (table_df, table_original):
         else:
             table_df[column_insert_concat] = table_df[column_insert_concat] + part    
     
-    data_conversion(table_df, table_original)
+    return table_df
 
 
 
@@ -239,5 +238,5 @@ def eliminar_campo(engine, table_df, table_original):
         else: 
             break 
     
-    data_conversion(table_df, table_original)
+    return table_df
     
