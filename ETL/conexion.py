@@ -7,7 +7,7 @@ def obtener_conexion(nombre_bd, password):
         username = 'sa'
 
         connection_string = (
-            f'DRIVER={{ODBC Driver 18 for SQL Server}};'
+            f'DRIVER={{ODBC Driver 17 for SQL Server}};'
             f'SERVER={server};'
             f'DATABASE={nombre_bd};'
             f'UID={username};'

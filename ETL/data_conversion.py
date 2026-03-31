@@ -3,21 +3,6 @@ import re
 
 from pandas.api.types import is_datetime64_any_dtype
 
-# def menu_conversion (engine):
-#     query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'"
-#     df = pd.read_sql(query, engine)
-#     table_name = df.iloc[4]['TABLE_NAME']
-            
-#     table_query = f"SELECT * FROM {table_name}"
-            
-#     table_df = pd.read_sql(table_query, engine)
-#     table_original = table_df.columns.tolist()
-    
-#     data_conversion(engine, table_df, table_original)
-    
-    
-    
-
 def data_conversion (table_df, table_original) :
     
     

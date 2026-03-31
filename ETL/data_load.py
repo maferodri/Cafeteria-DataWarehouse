@@ -1,6 +1,24 @@
 import pandas as pd
+from sqlalchemy import inspect
 
 def data_load(df_conv, table_destination, engine):
+    
+    inspector = inspect(engine)
+
+    col_inspector = inspector.get_columns(table_destination)
+
+    # for col in columnas:
+    #     print(f"Columna: {col['name']}")
+    #     print(f"  - Tipo: {col['type']}")
+    #     print(f"  - ¿Permite Nulos?: {col['nullable']}")
+    #     # Si es un tipo con longitud (como CHAR o VARCHAR), aquí aparecerá
+    #     if hasattr(col['type'], 'length'):
+    #         print(f"  - Longitud máxima: {col['type'].length}")
+    #     print("-" * 20)
+
+
+
+
     #Insertar los datos
     
     print("\n==========================================")
@@ -19,7 +37,7 @@ def data_load(df_conv, table_destination, engine):
     print(columns_destination)
     print("")
     
-    df_final = df_destination
+    df_final = df_destination.reindex(index=[])
     
     print("COLUMNAS DISPONIBLES ---->")
     for column in columns_conv:
@@ -44,15 +62,19 @@ def data_load(df_conv, table_destination, engine):
     print("\nESTE SERIA EL EMPAREJAMIENTO FINAL")
     for i in range(len(column_pair)):
         print(f"{column_pair[i]}  ---->   {columns_destination[i]}")
+        
+    opt_emp = input("\nEsta de acuerdo con el emparejamiento? [s/n]: ")
             
-    
-    df_final.to_sql(
-    name=table_destination,
-    con=engine,
-    schema='dbo',
-    if_exists='append',
-    index=False
-    )
+    try:
+        df_final.to_sql(
+        name=table_destination,
+        con=engine,
+        schema='dbo',
+        if_exists='append',
+        index=False
+        )
+    except Exception as e:
+        print(f"Ha ocurrido un error: {e}")
     
     print("INSERCION COMPLETADA !!!!!!!!!!!")
     
