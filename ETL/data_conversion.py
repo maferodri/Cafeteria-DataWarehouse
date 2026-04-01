@@ -208,7 +208,7 @@ def concatenar_campos (table_df, table_original):
 
 
 
-def eliminar_campo(engine, table_df, table_original):
+def eliminar_campo(table_df, table_original):
     print("/////ELIMINAR UNA COLUMNA O CAMPO")
     print("\nColumnas Disponibles a eliminar")
     columnas_originales = table_original.columns.tolist()
