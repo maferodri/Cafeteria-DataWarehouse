@@ -46,6 +46,11 @@ def extraccion(engine_oltp):
 
 
                 query = input("\nIntroduce tu consulta SQL: ")
+
+                if not query:
+                    print("La consulta no puede estar vacía. Intenta de nuevo.")
+                    continue
+
                 try:
                     df = pd.read_sql(query, engine_oltp)
 
@@ -64,7 +69,7 @@ def extraccion(engine_oltp):
         elif opcion == '1':
             while True:
                 try: 
-                    query_tables = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'"
+                    query_tables = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME != 'sysdiagrams'"
                     tablas_df = pd.read_sql(query_tables, engine_oltp)
                     lista_tablas = tablas_df['TABLE_NAME'].tolist()
 

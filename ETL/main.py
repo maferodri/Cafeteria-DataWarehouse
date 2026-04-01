@@ -21,25 +21,31 @@ def main():
         else:
             print("Contraseña incorrecta. Intente nuevamente")
     
-    df_extraccion = extraccion(engine_origen)
+    while True: 
+        df_extraccion = extraccion(engine_origen)
 
-    if df_extraccion is not None:
-        tabla_dest, cols_dest = seleccionar_destino(engine_destino)
+        if df_extraccion is not None:
+            tabla_dest, cols_dest = seleccionar_destino(engine_destino)
 
-        if tabla_dest:
-            df_carga = limpiar_datos(df_extraccion, engine_destino, tabla_dest)
+            if tabla_dest:
+                df_carga = limpiar_datos(df_extraccion, engine_destino, tabla_dest)
 
-        if df_carga is not None:
-            df_conv = data_conversion(df_carga, df_carga.columns.tolist())
+            if df_carga is not None:
+                df_conv = data_conversion(df_carga, df_carga.columns.tolist())
 
-            if df_conv is not None:
-                data_load(df_conv, tabla_dest, engine_destino)
+                if df_conv is not None:
+                    data_load(df_conv, tabla_dest, engine_destino)
 
+            else:
+                print("\nProceso finalizado: no hay registros nuevos para insertar.")
+                
         else:
-            print("\nProceso finalizado: no hay registros nuevos para insertar.")
-            
-    else:
-        print("Proceso finalizado")
+            break
+
+        continuar = input("\n¿Desea cargar otra tabla? (s/n): ").strip().lower()
+        if continuar != 's':
+            print('\nEl ETL finalizado correctamente')
+            break
 
 
 if __name__ == "__main__":

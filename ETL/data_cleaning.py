@@ -49,9 +49,8 @@ def limpiar_datos(df_extraido, engine_destino=None, tabla_destino=None):
             pks_validas = [pk for pk in pks_destino if pk in df.columns]
 
             if not pks_validas:
-                print(f"Error: La(s) PK(s) {pks_destino} no existen en los datos extraídos.")
-                print(f"  Columnas disponibles: {df.columns.tolist()}")
-                print("  Asegúrate de incluir la PK en tu extracción e intenta de nuevo.")
+                print(f"⚠ Los datos extraídos no corresponden a la tabla destino '{tabla_destino}'.")
+                print(f"  Selecciona una tabla destino compatible con los datos extraídos.")
                 return None
 
             cols_pk_str = ", ".join(pks_validas)
