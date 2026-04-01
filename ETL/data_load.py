@@ -54,7 +54,7 @@ def data_load(df_conv, table_destination, engine):
         for column in columns_destination:
             
             while True:
-                print(f"Eliga la columna para {column}")
+                print(f"\nEliga la columna para {column}")
                 col_select = input("\nIngrese el nombre: ")
                 if col_select not in columns_conv:
                     print("No existe esa columna")
@@ -62,6 +62,16 @@ def data_load(df_conv, table_destination, engine):
                     insp_col = columns_inspector[column];
                     # print(insp_col['type'])
                     # print(df_conv[col_select].dtype)
+
+                    tipos_permitidos = ['object', 'datetime64[ns]']
+
+                    if ('DATE' in str(insp_col['type']).upper()) and (df_conv[col_select].dtype not in tipos_permitidos):
+                        print("El tipo de datos no coincide")
+                        continue
+
+                    # if ('DATE' in str(insp_col['type']) or 'DATETIME' in str(insp_col['type'])) and (df_conv[col_select].dtype != 'object' or df_conv[col_select].dtype != 'datetime64[ns]'):
+                    #     print("El tipo de datos no coincide")
+                    #     continue
 
                     if 'INTEGER' in str(insp_col['type']) and df_conv[col_select].dtype != 'Int64':
                         print("El tipo de datos no coincide")
