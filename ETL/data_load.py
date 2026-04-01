@@ -1,3 +1,5 @@
+import re
+
 import pandas as pd
 from sqlalchemy import inspect
 
@@ -6,6 +8,7 @@ def data_load(df_conv, table_destination, engine):
     inspector = inspect(engine)
 
     col_inspector = inspector.get_columns(table_destination)
+    columns_inspector = {col['name']: col for col in col_inspector}
 
     # for col in columnas:
     #     print(f"Columna: {col['name']}")
@@ -46,24 +49,54 @@ def data_load(df_conv, table_destination, engine):
     
     column_pair = []
     
-    for column in columns_destination:
-        print(f"Eliga la columna para {column}")
+    while True:
+
+        for column in columns_destination:
+            
+            while True:
+                print(f"Eliga la columna para {column}")
+                col_select = input("\nIngrese el nombre: ")
+                if col_select not in columns_conv:
+                    print("No existe esa columna")
+                else:
+                    insp_col = columns_inspector[column];
+                    # print(insp_col['type'])
+                    # print(df_conv[col_select].dtype)
+
+                    if 'INTEGER' in str(insp_col['type']) and df_conv[col_select].dtype != 'Int64':
+                        print("El tipo de datos no coincide")
+                        continue
+
+                    if 'CHAR' in str(insp_col['type']):
+
+                        if (df_conv[col_select].dtype != 'string'):
+                            print('El tipo de dato no coincide')
+                            continue
+
+                        type_str = str(insp_col['type'])
+                        match = re.search(r'\((\d+)\)', type_str)
+                        max_largo = df_conv[col_select].str.len().max()
+                        if match:
+                            size_limit = int(match.group(1))
+                            if (max_largo > size_limit):
+                                print("Existe un registro con mas datos de los permitidos")
+                                continue
+
+                    break
+            
+            column_pair.append(col_select)
+            df_final[column] = df_conv[col_select]
         
-        while True:
-            col_select = input("\nIngrese el nombre: ")
-            if col_select not in columns_conv:
-                print("No existe esa columna")
-            else:
-                break
-        
-        column_pair.append(col_select)
-        df_final[column] = df_conv[col_select]
-    
-    print("\nESTE SERIA EL EMPAREJAMIENTO FINAL")
-    for i in range(len(column_pair)):
-        print(f"{column_pair[i]}  ---->   {columns_destination[i]}")
-        
-    opt_emp = input("\nEsta de acuerdo con el emparejamiento? [s/n]: ")
+        print("\nESTE SERIA EL EMPAREJAMIENTO FINAL")
+        for i in range(len(column_pair)):
+            print(f"{column_pair[i]}  ---->   {columns_destination[i]}")
+            
+        opt_emp = input("\nSi esta de acuerdo con el emparejamiento inserte [s]: ")
+        if opt_emp == 's':
+            break
+        else:
+            print("Se volvera a hacer el emparejamiento \n")
+                    
             
     try:
         df_final.to_sql(
