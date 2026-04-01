@@ -63,6 +63,9 @@ def data_load(df_conv, table_destination, engine):
                     # print(insp_col['type'])
                     # print(df_conv[col_select].dtype)
 
+                    #añadir de flotantes
+                    #añadir de conversion de str a datetime
+
                     tipos_permitidos = ['object', 'datetime64[ns]']
 
                     if ('DATE' in str(insp_col['type']).upper()) and (df_conv[col_select].dtype not in tipos_permitidos):
