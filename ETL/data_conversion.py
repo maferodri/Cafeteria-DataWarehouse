@@ -21,8 +21,9 @@ def data_conversion (table_df, table_original) :
         print("3: Obtener parte de fecha")
         print("4: Concatenar Campos")
         print("5: Eliminar Columna")
-        print("6: Vista Previa de las tablas")
-        print("7: Salir del Menu Conversion")
+        print("6: Cambiar tipo de dato (Texto a Fecha)")
+        print("7: Vista Previa de las tablas")
+        print("8: Salir del Menu Conversion")
         
         opt = input("\nSelecciona un numero: ")
         
@@ -37,9 +38,11 @@ def data_conversion (table_df, table_original) :
         elif opt == "5":
             table_df = eliminar_campo(table_df, table_original)
         elif opt == "6":
+            table_df = cambiar_dato(table_df, table_original)
+        elif opt == "7":
             print("Vista Previa de toda la tabla")
             print(table_df.head())
-        elif opt == "7":
+        elif opt == "8":
             return table_df
         else:
             print("No esta dentro de las opciones mencionadas")
@@ -127,27 +130,32 @@ def extraer_fecha (table_df, table_original):
         is_date_time = pd.to_datetime(table_df[column_conversion], errors='coerce', format='mixed').notna().all()
         
         if column_conversion in table_original:
-            if not (is_date_time):
+            if not (is_date_time) or table_df[column_conversion].dtype == 'Int64':
                 print("La columna seleccionada no es un tipo de dato admitido")
             else:
-                if table_df[column_conversion].dtype == "str":
+                print(table_df[column_conversion].dtype)
+                if table_df[column_conversion].dtype == "string":
                     insert_conversion = "DT_" + column_conversion
                     print("El campo seleccionado no es una fecha, pero se creara una columna para ser usada")
                     print("Nombre de la nueva columna: " + insert_conversion)
                 break;
         else:
             print("La columna no existe, vuelva a ingresar el nombre de la columna")
-    
-    table_df[insert_conversion] = pd.to_datetime(table_df[column_conversion], format='mixed')
+    try:
+        table_df[insert_conversion] = pd.to_datetime(table_df[column_conversion], format='mixed')
+    except Exception as e:
+        print("El formato de tipo string no es posible convertirlo a date")
     
     print("\nQue desea obtener de la fecha?")
     print("1. Año")
-    print("2. Mes")
-    print("3. Dia")
-    print("4. hora")
-    print("5. AM o PM")
+    print("2. Semestre")
+    print("3. Trimestre")
+    print("4. Mes")
+    print("5. Dia")
+    print("6. hora")
+    print("7. AM o PM")
     
-    opciones = ["1", "2", "3", "4", "5"]
+    opciones = ["1", "2", "3", "4", "5", "6"]
     
     while True:
         opt = input("\nSelecciona un numero: ")
@@ -171,12 +179,16 @@ def extraer_fecha (table_df, table_original):
     if opt == "1":
         table_df[column_date] = table_df[insert_conversion].dt.year
     elif opt == "2":
-        table_df[column_date] = table_df[insert_conversion].dt.month_name()
+        table_df[column_date] = (table_df[column_date].dt.quarter - 1) // 2 + 1
     elif opt == "3":
-        table_df[column_date] = table_df[insert_conversion].dt.day
+        table_df[column_date] = table_df[insert_conversion].dt.quarter
     elif opt == "4":
-        table_df[column_date] = table_df[insert_conversion].dt.hour
+        table_df[column_date] = table_df[insert_conversion].dt.month_name()
     elif opt == "5":
+        table_df[column_date] = table_df[insert_conversion].dt.day
+    elif opt == "6":
+        table_df[column_date] = table_df[insert_conversion].dt.hour
+    elif opt == "7":
         table_df[column_date] = table_df.apply(lambda x: "AM" if x[insert_conversion].hour < 12 else "PM", axis=1)
     
     return table_df
@@ -211,7 +223,7 @@ def concatenar_campos (table_df, table_original):
 def eliminar_campo(table_df, table_original):
     print("/////ELIMINAR UNA COLUMNA O CAMPO")
     print("\nColumnas Disponibles a eliminar")
-    columnas_originales = table_original.columns.tolist()
+    columnas_originales = table_original
     columnas = table_df.columns.tolist()
     for columna in columnas:
         if (columna not in columnas_originales):
@@ -219,9 +231,51 @@ def eliminar_campo(table_df, table_original):
     while True:
         column_delete = input("Seleccciona la columna que sera eliminada: ")
         if column_delete not in columnas or column_delete in columnas_originales:
-            print("La columna no existe o no puede ser cambiada")   
-        else: 
+            print("La columna no existe o no puede ser cambiada")
+            return table_df   
+        else:
+            table_df = table_df.drop(columns=[column_delete])
             break 
     
+    return table_df
+
+
+
+
+
+
+
+
+
+def cambiar_dato(table_df, table_original):
+    print("\nPorfavor seleccione el numero y la columna que desea editar")
+    columnas = table_df.columns.tolist()
+    print("----------------Columnas ------->")
+    for column in columnas:
+        print(column) 
+    
+    while True:
+        column_conversion = input("\nNombre de la columna: ")
+        insert_conversion = column_conversion
+        is_date_time = pd.to_datetime(table_df[column_conversion], errors='coerce', format='mixed').notna().all()
+        
+        if column_conversion in table_original:
+            if not (is_date_time) or table_df[column_conversion].dtype == 'Int64':
+                print("La columna seleccionada no es un tipo de dato admitido")
+                return table_df;
+            else:
+                insert_conversion = input("Escriba el nombre de la nueva columna: ")
+                for column in table_original:
+                    if column == insert_conversion:
+                        print("La columna ya esta dentro de la base de datos")
+                        return table_df
+                break;
+        else:
+            print("La columna no existe")
+            return table_df;
+    try:
+        table_df[insert_conversion] = pd.to_datetime(table_df[column_conversion], format='mixed')
+    except Exception as e:
+        print("El formato de tipo string no es posible convertirlo a date")
     return table_df
     

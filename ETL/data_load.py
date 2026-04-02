@@ -41,10 +41,15 @@ def data_load(df_conv, table_destination, engine):
     while True:
 
         for column in columns_destination:
+
+            column_pair = []
             
             while True:
-                print(f"\nEliga la columna para {column}")
+                print(f"\nEliga la columna para {column} o si deseas retornar al menu de conversion presiona [c]")
                 col_select = input("\nIngrese el nombre: ")
+                if col_select == 'c':
+                    print('--------------REGRESANDO A LA CONVERSION----------------')
+                    return 0, df_conv
                 if col_select not in columns_conv:
                     print("No existe esa columna")
                 else:
@@ -95,9 +100,11 @@ def data_load(df_conv, table_destination, engine):
         for i in range(len(column_pair)):
             print(f"{column_pair[i]}  ---->   {columns_destination[i]}")
             
-        opt_emp = input("\nSi esta de acuerdo con el emparejamiento inserte [s]: ")
+        opt_emp = input("\nSi esta de acuerdo con el emparejamiento inserte [s] o si desea regresar al menu de conversion [c]: ")
         if opt_emp == 's':
             break
+        if opt_emp == 'c':
+            return 0, df_conv
         else:
             print("Se volvera a hacer el emparejamiento \n")
 
@@ -112,7 +119,9 @@ def data_load(df_conv, table_destination, engine):
         )
     except Exception as e:
         print(f"Ha ocurrido un error: {e}")
+        return -1, df_conv;
     
     print("\nINSERCION COMPLETADA !!!!!!!!!!!")
+    return 1, df_conv;
     
     

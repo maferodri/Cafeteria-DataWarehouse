@@ -30,11 +30,15 @@ def main():
             if tabla_dest:
                 df_carga = limpiar_datos(df_extraccion, engine_destino, tabla_dest)
 
-            if df_carga is not None:
-                df_conv = data_conversion(df_carga, df_carga.columns.tolist())
+            result = 0
+            df_mod = df_carga
+            while result == 0:    
+                if df_mod is not None:
+                    df_conv = data_conversion(df_mod, df_carga.columns.tolist())
 
-                if df_conv is not None:
-                    data_load(df_conv, tabla_dest, engine_destino)
+                    if df_conv is not None:
+                        result, df_mod = data_load(df_conv, tabla_dest, engine_destino)
+                    
 
             else:
                 print("\nProceso finalizado: no hay registros nuevos para insertar.")
