@@ -50,8 +50,8 @@ def limpiar_datos(df_extraido, engine_destino=None, tabla_destino=None):
 
             if not pks_validas:
                 print(f"Los datos extraídos no corresponden a la tabla destino '{tabla_destino}'.")
-                print(f"  Selecciona una tabla destino compatible con los datos extraídos.")
-                return None
+                print(f"Selecciona una tabla destino compatible con los datos extraídos.")
+                return "WRONG_TABLE"
 
             cols_pk_str = ", ".join(pks_validas)
             df_existente_pk = pd.read_sql(f"SELECT {cols_pk_str} FROM {tabla_destino}", engine_destino)
