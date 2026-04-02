@@ -8,8 +8,11 @@ def data_conversion (table_df, table_original) :
     
     print('\nEjemplo de los primeros 5 registros de la tabla seleccionada')
     print(table_df.head()) 
+
+    print("\n==============================================================")
+    print("            PASO 4: DATA CONVERSION          ")
+    print("==============================================================")
     
-    print("\n//////// BIENVENIDO AL DATA CONVERSION /////////////// \n")
 
     #Forzar a cambiar los tipos de datos que se regreso de la DB
     table_df = table_df.convert_dtypes()
@@ -64,6 +67,10 @@ def conversion_minuscula (table_df, table_original):
         if column_conversion in table_original:
             if table_df[column_conversion].dtype != "string":
                 print("La columna seleccionada no es un tipo de dato admitido")
+                #Mafer: preguntar si quiere intentar con otra columna o salir:
+                salir = input("¿Desea intentar con otra columna? [s] o regresar al menu [c]: ")
+                if salir == 'c':
+                    return table_df
                 #return
             else:
                 break;
@@ -97,6 +104,10 @@ def conversion_mayuscula (table_df, table_original):
         if column_conversion in table_original:
             if table_df[column_conversion].dtype != "string":
                 print("La columna seleccionada no es un tipo de dato admitido")
+                #Mafer
+                salir = input("¿Desea intentar con otra columna? [s] o regresar al menu [c]: ")
+                if salir == 'c':
+                    return table_df
                 #return;
             else:
                 break;
@@ -132,6 +143,10 @@ def extraer_fecha (table_df, table_original):
         if column_conversion in table_original:
             if not (is_date_time) or table_df[column_conversion].dtype == 'Int64':
                 print("La columna seleccionada no es un tipo de dato admitido")
+                #Mafer
+                salir = input("¿Desea intentar con otra columna? [s] o regresar al menu [c]: ")
+                if salir == 'c':
+                    return table_df
             else:
                 print(table_df[column_conversion].dtype)
                 if table_df[column_conversion].dtype == "string":
@@ -155,7 +170,8 @@ def extraer_fecha (table_df, table_original):
     print("6. hora")
     print("7. AM o PM")
     
-    opciones = ["1", "2", "3", "4", "5", "6"]
+    #Mafer: Agregue el 7 a las opciones para que funcione
+    opciones = ["1", "2", "3", "4", "5", "6", "7"]
     
     while True:
         opt = input("\nSelecciona un numero: ")
@@ -179,11 +195,13 @@ def extraer_fecha (table_df, table_original):
     if opt == "1":
         table_df[column_date] = table_df[insert_conversion].dt.year
     elif opt == "2":
-        table_df[column_date] = (table_df[column_date].dt.quarter - 1) // 2 + 1
+        #Mafer: se usaba una variable que no existe aun
+        table_df[column_date] = (table_df[insert_conversion].dt.quarter - 1) // 2 + 1
     elif opt == "3":
         table_df[column_date] = table_df[insert_conversion].dt.quarter
     elif opt == "4":
-        table_df[column_date] = table_df[insert_conversion].dt.month_name()
+        #Mafer: en la BD tenemos el mes como integer 
+        table_df[column_date] = table_df[insert_conversion].dt.month
     elif opt == "5":
         table_df[column_date] = table_df[insert_conversion].dt.day
     elif opt == "6":

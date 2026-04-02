@@ -13,7 +13,7 @@ def data_load(df_conv, table_destination, engine):
     #Insertar los datos
     
     print("\n==========================================")
-    print("CARGAR LOS DATOS")
+    print("PASO 5: CARGAR LOS DATOS")
     print("=============================================")
     print("Ahora emparejemos las tablas de la BD Origen y la BD Destino")
     
@@ -39,11 +39,10 @@ def data_load(df_conv, table_destination, engine):
     column_pair = []
     
     while True:
-
+        #Mafer: quite el column_pair del for porque no se imprimia bien
+        column_pair = []
         for column in columns_destination:
 
-            column_pair = []
-            
             while True:
                 print(f"\nEliga la columna para {column} o si deseas retornar al menu de conversion presiona [c]")
                 col_select = input("\nIngrese el nombre: ")
@@ -53,6 +52,7 @@ def data_load(df_conv, table_destination, engine):
                 if col_select not in columns_conv:
                     print("No existe esa columna")
                 else:
+
                     insp_col = columns_inspector[column];
                     # print(insp_col['type'])
                     # print(df_conv[col_select].dtype)
@@ -61,16 +61,27 @@ def data_load(df_conv, table_destination, engine):
                     
                     #Verificacion de Fechas
 
-                    tipos_permitidos = ['object', 'datetime64[ns]']
-                    if ('DATE' in str(insp_col['type']).upper()) and (df_conv[col_select].dtype not in tipos_permitidos):
-                        print("El tipo de datos no coincide")
-                        continue
+                    #tipos_permitidos = ['object', 'datetime64[ns]']
+                    #if ('DATE' in str(insp_col['type']).upper()) and (df_conv[col_select].dtype not in tipos_permitidos):
+                        #print("El tipo de datos no coincide")
+                        #continue
+
+                    #Mafer 
+                    if 'DATE' in str(insp_col['type']).upper():
+                        col_dtype = str(df_conv[col_select].dtype)
+                        if not (col_dtype.startswith('datetime64') or col_dtype == 'object'):
+                            print("El tipo de datos no coincide")
+                            continue
 
                     #Verificacion de Enteros
 
-                    if 'INTEGER' in str(insp_col['type']) and df_conv[col_select].dtype != 'Int64':
-                        print("El tipo de datos no coincide")
-                        continue
+                    #Mafer: Habia problemas al insertar semestre, tri y asi 
+                    tipos_entero_sql = ['INTEGER', 'INT', 'SMALLINT', 'BIGINT', 'TINYINT']
+                    if any(t in str(insp_col['type']).upper() for t in tipos_entero_sql):
+                        col_dtype = str(df_conv[col_select].dtype)
+                        if not (col_dtype.startswith('int') or col_dtype.startswith('Int')):
+                            print("El tipo de datos no coincide")
+                            continue
 
                     #Verificacion de CHAR o VARCHAR
 
@@ -100,7 +111,8 @@ def data_load(df_conv, table_destination, engine):
         for i in range(len(column_pair)):
             print(f"{column_pair[i]}  ---->   {columns_destination[i]}")
             
-        opt_emp = input("\nSi esta de acuerdo con el emparejamiento inserte [s] o si desea regresar al menu de conversion [c]: ")
+        #Mafer: poner la opcion de que si lo pueden rehacer    
+        opt_emp = input("\n¿De acuerdo? [s] / rehacer [r] / conversion [c]: ")
         if opt_emp == 's':
             break
         if opt_emp == 'c':

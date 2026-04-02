@@ -49,7 +49,7 @@ def limpiar_datos(df_extraido, engine_destino=None, tabla_destino=None):
             pks_validas = [pk for pk in pks_destino if pk in df.columns]
 
             if not pks_validas:
-                print(f"⚠ Los datos extraídos no corresponden a la tabla destino '{tabla_destino}'.")
+                print(f"Los datos extraídos no corresponden a la tabla destino '{tabla_destino}'.")
                 print(f"  Selecciona una tabla destino compatible con los datos extraídos.")
                 return None
 
@@ -75,19 +75,16 @@ def limpiar_datos(df_extraido, engine_destino=None, tabla_destino=None):
     else:
         print("No se proporcionó tabla destino. Se omite esta validación.")
 
-    print("\n==============================================================")
-    print("                     RESUMEN DE LIMPIEZA                     ")
-    print("==============================================================")
+    print("\n--------------------------------------------------------------")
+    print(" 3. Resumen de la limpieza: ")
+    print("--------------------------------------------------------------")
     print(f"  Registros originales:         {registros_iniciales}")
     print(f"  Registros tras limpieza:      {len(df)}")
     print(f"  Registros listos a insertar:  {len(df_nuevo)}")
-    print("==============================================================")
+    print("--------------------------------------------------------------")
 
     if df_nuevo.empty:
         print("\nNo hay registros nuevos para insertar.")
         return None
-
-    print(f"\nVista previa de registros a insertar:")
-    print(df_nuevo.head())
 
     return df_nuevo

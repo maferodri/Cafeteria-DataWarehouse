@@ -45,7 +45,7 @@ def extraccion(engine_oltp):
                     print(f"\n TABLA: {tabla} -> CAMPOS: {lista_campos}")
 
 
-                query = input("\nIntroduce tu consulta SQL: ")
+                query = input("\nIntroduce tu consulta SQL: ").strip()
 
                 if not query:
                     print("La consulta no puede estar vacía. Intenta de nuevo.")
