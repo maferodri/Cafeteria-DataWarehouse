@@ -239,7 +239,7 @@ def concatenar_campos (table_df, table_original):
 
 
 def eliminar_campo(table_df, table_original):
-    print("/////ELIMINAR UNA COLUMNA O CAMPO")
+    print("----------ELIMINAR UNA COLUMNA O CAMPO----------")
     print("\nColumnas Disponibles a eliminar")
     columnas_originales = table_original
     columnas = table_df.columns.tolist()
@@ -247,7 +247,11 @@ def eliminar_campo(table_df, table_original):
         if (columna not in columnas_originales):
             print(columna)
     while True:
-        column_delete = input("Seleccciona la columna que sera eliminada: ")
+        column_delete = input("Seleccciona la columna que sera eliminada o [c] para regresar: ")
+        #Agregue menu para regresar 
+        if column_delete == 'c':
+            return table_df
+        
         if column_delete not in columnas or column_delete in columnas_originales:
             print("La columna no existe o no puede ser cambiada")
             return table_df   

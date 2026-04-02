@@ -58,11 +58,12 @@ def main():
                 while result == 0:    
                     if df_mod is not None:
                         df_conv = data_conversion(df_mod, df_carga.columns.tolist())
-
                         if df_conv is not None:
                             result, df_mod = data_load(df_conv, tabla_dest, engine_destino)
-
-                if result == 1:
+                if result == -2:
+                    print("\nRegresando al Paso 1...")
+                    continue  
+                elif result == 1:
                     print("\nProceso finalizado exitosamente.")
                 elif result == -1:
                     print("\nEl proceso finalizó con errores en la inserción.")

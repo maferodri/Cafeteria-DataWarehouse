@@ -13,7 +13,7 @@ def data_load(df_conv, table_destination, engine):
     #Insertar los datos
     
     print("\n==========================================")
-    print("PASO 5: CARGAR LOS DATOS")
+    print("         PASO 5: CARGAR LOS DATOS")
     print("=============================================")
     print("Ahora emparejemos las tablas de la BD Origen y la BD Destino")
     
@@ -44,11 +44,18 @@ def data_load(df_conv, table_destination, engine):
         for column in columns_destination:
 
             while True:
-                print(f"\nEliga la columna para {column} o si deseas retornar al menu de conversion presiona [c]")
+                #Mafer: cuando no esta la columa para emparejar regresar a la conversion no nos sirve, 
+                #lo que nos sirve es dejarlo en null o volver al paso 1. 
+                print(f"\nElija la columna para {column} o presiona [s] para dejar en NULL, [c] para regresar al paso 1")
                 col_select = input("\nIngrese el nombre: ")
                 if col_select == 'c':
-                    print('--------------REGRESANDO A LA CONVERSION----------------')
-                    return 0, df_conv
+                    print('--------------REGRESANDO AL PASO 1----------------')
+                    return -2, df_conv
+                if col_select == 's':
+                    print(f"{column} quedará como NULL")
+                    df_final[column] = None
+                    column_pair.append('NULL')
+                    break
                 if col_select not in columns_conv:
                     print("No existe esa columna")
                 else:
