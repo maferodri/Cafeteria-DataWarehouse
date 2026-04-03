@@ -1,10 +1,16 @@
 import pandas as pd
 from sqlalchemy import create_engine, text
+from colorama import Fore, Style, init
+
+# Colores
+init(autoreset=True)
 
 def obtener_conexion(nombre_bd, password):
     try:
-        server = 'localhost,1433' 
+        server = 'localhost\\SQLEXPRESS' 
         username = 'sa'
+
+        print(f"{Fore.CYAN}Intentando conectar a la base de datos: {nombre_bd}...")
 
         connection_string = (
             f'DRIVER={{ODBC Driver 17 for SQL Server}};'
@@ -21,11 +27,11 @@ def obtener_conexion(nombre_bd, password):
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
 
-        print(f"Conexión a '{nombre_bd}' exitosa.")
+        print(f"{Fore.GREEN}Conexión a '{nombre_bd}' exitosa.")
         return engine
     
     except Exception as e:
-        print(f"Contraseña incorrecta o servidor no disponible.")
+        print(f"{Fore.RED}Contraseña incorrecta o servidor no disponible para '{nombre_bd}'.")
         return None
     
 
@@ -38,5 +44,3 @@ def conexion_olap(password):
     database = 'DW_CAFETERIA'
     engine = obtener_conexion(database, password)
     return engine
-
-

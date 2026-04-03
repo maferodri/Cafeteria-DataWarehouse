@@ -1,31 +1,35 @@
 import pandas as pd
+from colorama import Fore, Style, init
+
+# Colores
+init(autoreset=True)
 
 def limpiar_datos(df_extraido, engine_destino=None, tabla_destino=None):
-    print("\n==============================================================")
-    print("            PASO 3: LIMPIEZA Y VALIDACIÓN DE DATOS           ")
-    print("==============================================================")
+    print(f"\n{Fore.CYAN}==============================================================")
+    print(f"{Fore.CYAN}            PASO 3: LIMPIEZA Y VALIDACIÓN DE DATOS            ")
+    print(f"{Fore.CYAN}==============================================================")
 
     df = df_extraido.copy()
     registros_iniciales = len(df)
     print(f"\nRegistros recibidos: {registros_iniciales}")
 
 
-    print("\n--------------------------------------------------------------")
+    print(f"\n{Fore.CYAN}--------------------------------------------------------------")
     print(" 1. Revisión de duplicados internos")
-    print("--------------------------------------------------------------")
+    print(f"{Fore.CYAN}--------------------------------------------------------------")
 
     cantidad_duplicados = df.duplicated().sum()
 
     if cantidad_duplicados > 0:
-        print(f"\nSe encontraron {cantidad_duplicados} filas duplicadas en los datos extraídos.")
+        print(f"\n{Fore.YELLOW}Se encontraron {cantidad_duplicados} filas duplicadas en los datos extraídos.")
         df = df.drop_duplicates()
         print(f"Duplicados eliminados. Registros restantes: {len(df)}")
     else:
-        print("No se encontraron duplicados internos.")
+        print(f"{Fore.GREEN}No se encontraron duplicados internos.")
 
-    print("\n--------------------------------------------------------------")
+    print(f"\n{Fore.CYAN}--------------------------------------------------------------")
     print(" 2. Revisión contra registros ya existentes en destino")
-    print("--------------------------------------------------------------")
+    print(f"{Fore.CYAN}--------------------------------------------------------------")
 
     df_nuevo = df.copy()
 
@@ -41,7 +45,7 @@ def limpiar_datos(df_extraido, engine_destino=None, tabla_destino=None):
             pks_destino = pk_df['COLUMN_NAME'].tolist()
 
             if not pks_destino:
-                print("No se encontró PK en la tabla destino. Se detiene el proceso.")
+                print(f"{Fore.RED}No se encontró PK en la tabla destino. Se detiene el proceso.")
                 return None
 
             print(f"\nPK detectada(s) en '{tabla_destino}': {', '.join(pks_destino)}")
@@ -49,8 +53,8 @@ def limpiar_datos(df_extraido, engine_destino=None, tabla_destino=None):
             pks_validas = [pk for pk in pks_destino if pk in df.columns]
 
             if not pks_validas:
-                print(f"Los datos extraídos no corresponden a la tabla destino '{tabla_destino}'.")
-                print(f"Selecciona una tabla destino compatible con los datos extraídos.")
+                print(f"{Fore.RED}Los datos extraídos no corresponden a la tabla destino '{tabla_destino}'.")
+                print(f"{Fore.RED}Selecciona una tabla destino compatible con los datos extraídos.")
                 return "WRONG_TABLE"
 
             cols_pk_str = ", ".join(pks_validas)
@@ -66,25 +70,25 @@ def limpiar_datos(df_extraido, engine_destino=None, tabla_destino=None):
             df_nuevo = df_merged[df_merged['_merge'] == 'left_only'].drop(columns=['_merge'])
             ya_existentes = len(df) - len(df_nuevo)
 
-            print(f"Registros ya existentes (omitidos): {ya_existentes}")
-            print(f"Registros nuevos a insertar:        {len(df_nuevo)}")
+            print(f"{Fore.YELLOW}Registros ya existentes (omitidos): {ya_existentes}")
+            print(f"{Fore.GREEN}Registros nuevos a insertar:        {len(df_nuevo)}")
 
         except Exception as e:
-            print(f"No se pudo comparar con la tabla destino: {e}")
+            print(f"{Fore.RED}No se pudo comparar con la tabla destino: {e}")
             return None
     else:
-        print("No se proporcionó tabla destino. Se omite esta validación.")
+        print(f"{Fore.YELLOW}No se proporcionó tabla destino. Se omite esta validación.")
 
-    print("\n--------------------------------------------------------------")
+    print(f"\n{Fore.CYAN}--------------------------------------------------------------")
     print(" 3. Resumen de la limpieza: ")
-    print("--------------------------------------------------------------")
+    print(f"{Fore.CYAN}--------------------------------------------------------------")
     print(f"  Registros originales:         {registros_iniciales}")
     print(f"  Registros tras limpieza:      {len(df)}")
-    print(f"  Registros listos a insertar:  {len(df_nuevo)}")
-    print("--------------------------------------------------------------")
+    print(f"  {Fore.GREEN}Registros listos a insertar:  {len(df_nuevo)}")
+    print(f"{Fore.CYAN}--------------------------------------------------------------")
 
     if df_nuevo.empty:
-        print("\nNo hay registros nuevos para insertar.")
+        print(f"\n{Fore.YELLOW}No hay registros nuevos para insertar.")
         return None
 
     return df_nuevo

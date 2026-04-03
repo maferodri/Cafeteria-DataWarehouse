@@ -1,7 +1,10 @@
 import re
-
 import pandas as pd
 from sqlalchemy import inspect
+from colorama import Fore, Style, init
+
+# Colores
+init(autoreset=True)
 
 def data_load(df_conv, table_destination, engine):
 
@@ -12,9 +15,9 @@ def data_load(df_conv, table_destination, engine):
 
     #Insertar los datos
     
-    print("\n==========================================")
-    print("         PASO 5: CARGAR LOS DATOS")
-    print("=============================================")
+    print(f"\n{Fore.CYAN}==========================================")
+    print(f"{Fore.CYAN}         PASO 5: CARGAR LOS DATOS")
+    print(f"{Fore.CYAN}=============================================")
     print("Ahora emparejemos las tablas de la BD Origen y la BD Destino")
     
     query_destination = f"SELECT * FROM {table_destination}"
@@ -24,7 +27,7 @@ def data_load(df_conv, table_destination, engine):
     
     columns_conv = df_conv.columns.tolist()
     
-    print("Se necesitan llenar las siguientes columnas: ")
+    print(f"\n{Fore.YELLOW}Se necesitan llenar las siguientes columnas: ")
     print(columns_destination)
     print("")
 
@@ -32,7 +35,7 @@ def data_load(df_conv, table_destination, engine):
     
     df_final = df_destination.reindex(index=[])
     
-    print("COLUMNAS DISPONIBLES ---->")
+    print(f"{Fore.MAGENTA}COLUMNAS DISPONIBLES ---->")
     for column in columns_conv:
         print(column)
     print("")
@@ -46,18 +49,18 @@ def data_load(df_conv, table_destination, engine):
             while True:
                 #Mafer: cuando no esta la columa para emparejar regresar a la conversion no nos sirve, 
                 #lo que nos sirve es dejarlo en null o volver al paso 1. 
-                print(f"\nElija la columna para {column} o presiona [s] para dejar en NULL, [c] para regresar al paso 1")
-                col_select = input("\nIngrese el nombre: ")
+                print(f"\nElija la columna para {Fore.GREEN}{column}{Style.RESET_ALL} o presiona {Fore.YELLOW}[s]{Style.RESET_ALL} para dejar en NULL, {Fore.YELLOW}[c]{Style.RESET_ALL} para regresar al paso 1")
+                col_select = input(f"{Fore.CYAN}Ingrese el nombre: ")
                 if col_select == 'c':
-                    print('--------------REGRESANDO AL PASO 1----------------')
+                    print(f'{Fore.RED}--------------REGRESANDO AL PASO 1----------------')
                     return -2, df_conv
                 if col_select == 's':
-                    print(f"{column} quedará como NULL")
+                    print(f"{Fore.YELLOW}{column} quedará como NULL")
                     df_final[column] = None
                     column_pair.append('NULL')
                     break
                 if col_select not in columns_conv:
-                    print("No existe esa columna")
+                    print(f"{Fore.RED}No existe esa columna")
                 else:
 
                     insp_col = columns_inspector[column];
@@ -77,7 +80,7 @@ def data_load(df_conv, table_destination, engine):
                     if 'DATE' in str(insp_col['type']).upper():
                         col_dtype = str(df_conv[col_select].dtype)
                         if not (col_dtype.startswith('datetime64') or col_dtype == 'object'):
-                            print("El tipo de datos no coincide")
+                            print(f"{Fore.RED}El tipo de datos no coincide (Se esperaba Fecha)")
                             continue
 
                     #Verificacion de Enteros
@@ -87,7 +90,7 @@ def data_load(df_conv, table_destination, engine):
                     if any(t in str(insp_col['type']).upper() for t in tipos_entero_sql):
                         col_dtype = str(df_conv[col_select].dtype)
                         if not (col_dtype.startswith('int') or col_dtype.startswith('Int')):
-                            print("El tipo de datos no coincide")
+                            print(f"{Fore.RED}El tipo de datos no coincide (Se esperaba Entero)")
                             continue
 
                     #Verificacion de CHAR o VARCHAR
@@ -95,7 +98,7 @@ def data_load(df_conv, table_destination, engine):
                     if 'CHAR' in str(insp_col['type']):
 
                         if (df_conv[col_select].dtype != 'string'):
-                            print('El tipo de dato no coincide')
+                            print(f'{Fore.RED}El tipo de dato no coincide (Se esperaba String/Char)')
                             continue
 
                         #Verificacion de que no exceda el limite del VARCHAR
@@ -106,7 +109,7 @@ def data_load(df_conv, table_destination, engine):
                         if match:
                             size_limit = int(match.group(1))
                             if (max_largo > size_limit):
-                                print("Existe un registro con mas datos de los permitidos")
+                                print(f"{Fore.RED}Existe un registro con mas datos de los permitidos (Máx: {size_limit})")
                                 continue
 
                     break
@@ -114,18 +117,18 @@ def data_load(df_conv, table_destination, engine):
             column_pair.append(col_select)
             df_final[column] = df_conv[col_select]
         
-        print("\nESTE SERIA EL EMPAREJAMIENTO FINAL")
+        print(f"\n{Fore.CYAN}ESTE SERIA EL EMPAREJAMIENTO FINAL")
         for i in range(len(column_pair)):
-            print(f"{column_pair[i]}  ---->   {columns_destination[i]}")
+            print(f"{Fore.YELLOW}{column_pair[i]}  {Fore.WHITE}---->   {Fore.GREEN}{columns_destination[i]}")
             
         #Mafer: poner la opcion de que si lo pueden rehacer    
-        opt_emp = input("\n¿De acuerdo? [s] / rehacer [r] / conversion [c]: ")
+        opt_emp = input(f"\n¿De acuerdo? {Fore.GREEN}[s]{Style.RESET_ALL} / rehacer {Fore.YELLOW}[r]{Style.RESET_ALL} / conversion {Fore.YELLOW}[c]{Style.RESET_ALL}: ")
         if opt_emp == 's':
             break
         if opt_emp == 'c':
             return 0, df_conv
         else:
-            print("Se volvera a hacer el emparejamiento \n")
+            print(f"{Fore.MAGENTA}Se volvera a hacer el emparejamiento \n")
 
     #Insercion de los datos en SQL Server   
     try:
@@ -137,10 +140,8 @@ def data_load(df_conv, table_destination, engine):
         index=False
         )
     except Exception as e:
-        print(f"Ha ocurrido un error: {e}")
+        print(f"{Fore.RED}Ha ocurrido un error en la inserción: {e}")
         return -1, df_conv;
     
-    print("\nINSERCION COMPLETADA !!!!!!!!!!!")
+    print(f"\n{Fore.GREEN}{Style.BRIGHT}INSERCION COMPLETADA !!!!!!!!!!!")
     return 1, df_conv;
-    
-    

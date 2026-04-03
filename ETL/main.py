@@ -5,21 +5,26 @@ from data_destination import seleccionar_destino
 from data_cleaning import limpiar_datos
 from data_conversion import data_conversion
 from data_load import data_load
+from colorama import init, Fore, Style
+
+# COLORES
+init(autoreset=True)
 
 def main():
-    print("=======================================================")
-    print("           BIENVENIDO AL SISTEMA ETL                   ")
-    print("=======================================================")
+    print(f"{Fore.CYAN}{Style.BRIGHT}=======================================================")
+    print(f"{Fore.CYAN}{Style.BRIGHT}           BIENVENIDO AL SISTEMA ETL                   ")
+    print(f"{Fore.CYAN}{Style.BRIGHT}=======================================================")
 
     while True: 
-        sql_password = input("Ingresa tu contraseña SQL Server: ")
+        sql_password = input(f"{Fore.MAGENTA}Ingresa tu contraseña SQL Server: {Style.RESET_ALL}")
         engine_origen = conexion_oltp(sql_password)
         engine_destino = conexion_olap(sql_password)
 
         if engine_origen and engine_destino:
+            print(f"{Fore.GREEN} Conexión establecida con éxito.\n")
             break
         else:
-            print("Contraseña incorrecta. Intente nuevamente")
+            print(f"{Fore.RED}Contraseña incorrecta. Intente nuevamente")
     
     while True: 
         df_extraccion = extraccion(engine_origen)
@@ -35,16 +40,16 @@ def main():
                 df_carga = limpiar_datos(df_extraccion, engine_destino, tabla_dest)
 
                 if isinstance(df_carga, str) and df_carga == "WRONG_TABLE":
-                    print("\nPor favor elige una tabla destino compatible.\n")
+                    print(f"{Fore.RED}\nPor favor elige una tabla destino compatible.\n")
                     continue
                 else:
                     break
 
             if df_carga is None:
-                print("\nNo hay registros nuevos para insertar.")
-                continuar = input("\n¿Desea cargar otra tabla? (s/n): ").strip().lower()
+                print(f"{Fore.YELLOW}\nNo hay registros nuevos para insertar.")
+                continuar = input(f"\n{Fore.MAGENTA}¿Desea cargar otra tabla? (s/n): {Style.RESET_ALL}").strip().lower()
                 if continuar != 's':
-                    print('\nEl ETL finalizado correctamente')
+                    print(f'{Fore.GREEN}\nEl ETL finalizado correctamente')
                     break
                 else:
                     continue
@@ -60,20 +65,21 @@ def main():
                         df_conv = data_conversion(df_mod, df_carga.columns.tolist())
                         if df_conv is not None:
                             result, df_mod = data_load(df_conv, tabla_dest, engine_destino)
+                
                 if result == -2:
-                    print("\nRegresando al Paso 1...")
+                    print(f"{Fore.YELLOW}\nRegresando al Paso 1...")
                     continue  
                 elif result == 1:
-                    print("\nProceso finalizado exitosamente.")
+                    print(f"{Fore.GREEN}{Style.BRIGHT}\nProceso finalizado exitosamente.")
                 elif result == -1:
-                    print("\nEl proceso finalizó con errores en la inserción.")
+                    print(f"{Fore.RED}{Style.BRIGHT}\nEl proceso finalizó con errores en la inserción.")
 
         else:
             break
 
-        continuar = input("\n¿Desea cargar otra tabla? (s/n): ").strip().lower()
+        continuar = input(f"\n{Fore.MAGENTA}¿Desea cargar otra tabla? (s/n): {Style.RESET_ALL}").strip().lower()
         if continuar != 's':
-            print('\nEl ETL finalizado correctamente')
+            print(f'{Fore.GREEN}\nEl ETL finalizado correctamente')
             break
 
 

@@ -1,24 +1,26 @@
 import pandas as pd
 import re
-
 from pandas.api.types import is_datetime64_any_dtype
+from colorama import Fore, Style, init
+
+# Colores
+init(autoreset=True)
 
 def data_conversion (table_df, table_original) :
     
-    
-    print('\nEjemplo de los primeros 5 registros de la tabla seleccionada')
+    print(f'\n{Fore.MAGENTA}Ejemplo de los primeros 5 registros de la tabla seleccionada')
     print(table_df.head()) 
 
-    print("\n==============================================================")
-    print("            PASO 4: DATA CONVERSION          ")
-    print("==============================================================")
+    print(f"\n{Fore.CYAN}==============================================================")
+    print(f"{Fore.CYAN}            PASO 4: DATA CONVERSION          ")
+    print(f"{Fore.CYAN}==============================================================")
     
 
     #Forzar a cambiar los tipos de datos que se regreso de la DB
     table_df = table_df.convert_dtypes()
     
     while True:
-        print("\nBien!! Ahora que cambio le quieres hacer? Selecciona el numero")
+        print(f"\n{Fore.YELLOW}Bien!! Ahora que cambio le quieres hacer? Selecciona el numero")
         print("\n1: Convertir a Minuscula")
         print("2: Convertir a Mayuscula")
         print("3: Obtener parte de fecha")
@@ -26,9 +28,9 @@ def data_conversion (table_df, table_original) :
         print("5: Eliminar Columna")
         print("6: Cambiar tipo de dato (Texto a Fecha)")
         print("7: Vista Previa de las tablas")
-        print("8: Salir del Menu Conversion")
+        print(f"{Fore.MAGENTA}8: Salir del Menu Conversion")
         
-        opt = input("\nSelecciona un numero: ")
+        opt = input(f"\n{Fore.CYAN}Selecciona un numero: {Style.RESET_ALL}")
         
         if opt == "1":
             table_df = conversion_minuscula(table_df, table_original)
@@ -43,125 +45,123 @@ def data_conversion (table_df, table_original) :
         elif opt == "6":
             table_df = cambiar_dato(table_df, table_original)
         elif opt == "7":
-            print("Vista Previa de toda la tabla")
+            print(f"{Fore.GREEN}Vista Previa de toda la tabla")
             print(table_df.head())
         elif opt == "8":
             return table_df
         else:
-            print("No esta dentro de las opciones mencionadas")
-    
-    
-    
-    
+            print(f"{Fore.RED}No esta dentro de las opciones mencionadas")
     
     
 def conversion_minuscula (table_df, table_original):
-    print("\nPorfavor seleccione el numero de la columna que desea editar")
+    print(f"\n{Fore.YELLOW}Porfavor seleccione el numero de la columna que desea editar")
     columnas = table_df.columns.tolist()
-    print("----------------Columnas ------->")
+    print(f"{Fore.MAGENTA}----------------Columnas ------->")
     for column in columnas:
         print(column) 
     
     while True:
-        column_conversion = input("\nNombre de la columna: ")
+        column_conversion = input(f"\n{Fore.CYAN}Nombre de la columna: {Style.RESET_ALL}")
         if column_conversion in table_original:
             if table_df[column_conversion].dtype != "string":
-                print("La columna seleccionada no es un tipo de dato admitido")
+                print(f"{Fore.RED}La columna seleccionada no es un tipo de dato admitido")
                 #Mafer: preguntar si quiere intentar con otra columna o salir:
-                salir = input("¿Desea intentar con otra columna? [s] o regresar al menu [c]: ")
+                salir = input(f"¿Desea intentar con otra columna? {Fore.GREEN}[s]{Style.RESET_ALL} o regresar al menu {Fore.YELLOW}[c]{Style.RESET_ALL}: ")
                 if salir == 'c':
                     return table_df
                 #return
             else:
                 break;
         else:
-            print("La columna no existe")
+            print(f"{Fore.RED}La columna no existe")
     
     while True:
-        column_add = input("Escriba el nombre de la nueva tabla en donde se guardaran los datos: ")
+        column_add = input(f"{Fore.CYAN}Escriba el nombre de la nueva tabla en donde se guardaran los datos: {Style.RESET_ALL}")
         if column_add in table_original:
-            print("Ya existe una tabla con ese nombre")
+            print(f"{Fore.RED}Ya existe una tabla con ese nombre")
         else:
             break;
     
     table_df[column_add] = ""
     table_df[column_add] = table_df[column_conversion].str.lower()
     
+    print(f"{Fore.GREEN}Conversión a minúscula completada en '{column_add}'")
     return table_df
 
 
 
 def conversion_mayuscula (table_df, table_original):
-    print("\nPorfavor seleccione el numero de la columna que desea editar")
+    print(f"\n{Fore.YELLOW}Porfavor seleccione el numero de la columna que desea editar")
     columnas = table_df.columns.tolist()
-    print("----------------Columnas ------->")
+    print(f"{Fore.MAGENTA}----------------Columnas ------->")
     for column in columnas:
         print(column) 
     
     while True:
-        column_conversion = input("\nNombre de la columna: ")
+        column_conversion = input(f"\n{Fore.CYAN}Nombre de la columna: {Style.RESET_ALL}")
         
         if column_conversion in table_original:
             if table_df[column_conversion].dtype != "string":
-                print("La columna seleccionada no es un tipo de dato admitido")
+                print(f"{Fore.RED}La columna seleccionada no es un tipo de dato admitido")
                 #Mafer
-                salir = input("¿Desea intentar con otra columna? [s] o regresar al menu [c]: ")
+                salir = input(f"¿Desea intentar con otra columna? {Fore.GREEN}[s]{Style.RESET_ALL} o regresar al menu {Fore.YELLOW}[c]{Style.RESET_ALL}: ")
                 if salir == 'c':
                     return table_df
                 #return;
             else:
                 break;
         else:
-            print("La columna no existe")
+            print(f"{Fore.RED}La columna no existe")
     
     while True:
-        column_add = input("Escriba el nombre de la nueva tabla en donde se guardaran los datos: ")
+        column_add = input(f"{Fore.CYAN}Escriba el nombre de la nueva tabla en donde se guardaran los datos: {Style.RESET_ALL}")
         if column_add in table_original:
-            print("Ya existe una tabla con ese nombre")
+            print(f"{Fore.RED}Ya existe una tabla con ese nombre")
         else:
             break;
     
     table_df[column_add] = ""
     table_df[column_add] = table_df[column_conversion].str.upper()
     
+    print(f"{Fore.GREEN}Conversión a mayúscula completada en '{column_add}'")
     return table_df
 
 
 
 def extraer_fecha (table_df, table_original):
-    print("\nPorfavor seleccione el numero y la columna que desea editar")
+    print(f"\n{Fore.YELLOW}Porfavor seleccione el numero y la columna que desea editar")
     columnas = table_df.columns.tolist()
-    print("----------------Columnas ------->")
+    print(f"{Fore.MAGENTA}----------------Columnas ------->")
     for column in columnas:
         print(column) 
     
     while True:
-        column_conversion = input("\nNombre de la columna: ")
+        column_conversion = input(f"\n{Fore.CYAN}Nombre de la columna: {Style.RESET_ALL}")
         insert_conversion = column_conversion
         is_date_time = pd.to_datetime(table_df[column_conversion], errors='coerce', format='mixed').notna().all()
         
         if column_conversion in table_original:
             if not (is_date_time) or table_df[column_conversion].dtype == 'Int64':
-                print("La columna seleccionada no es un tipo de dato admitido")
+                print(f"{Fore.RED}La columna seleccionada no es un tipo de dato admitido")
                 #Mafer
-                salir = input("¿Desea intentar con otra columna? [s] o regresar al menu [c]: ")
+                salir = input(f"¿Desea intentar con otra columna? {Fore.GREEN}[s]{Style.RESET_ALL} o regresar al menu {Fore.YELLOW}[c]{Style.RESET_ALL}: ")
                 if salir == 'c':
                     return table_df
             else:
-                print(table_df[column_conversion].dtype)
+                print(f"{Fore.WHITE}Dtype actual: {table_df[column_conversion].dtype}")
                 if table_df[column_conversion].dtype == "string":
                     insert_conversion = "DT_" + column_conversion
-                    print("El campo seleccionado no es una fecha, pero se creara una columna para ser usada")
-                    print("Nombre de la nueva columna: " + insert_conversion)
+                    print(f"{Fore.YELLOW}El campo seleccionado no es una fecha, pero se creara una columna para ser usada")
+                    print(f"Nombre de la nueva columna: {Fore.GREEN}{insert_conversion}")
                 break;
         else:
-            print("La columna no existe, vuelva a ingresar el nombre de la columna")
+            print(f"{Fore.RED}La columna no existe, vuelva a ingresar el nombre de la columna")
     try:
         table_df[insert_conversion] = pd.to_datetime(table_df[column_conversion], format='mixed')
     except Exception as e:
-        print("El formato de tipo string no es posible convertirlo a date")
+        print(f"{Fore.RED}El formato de tipo string no es posible convertirlo a date")
     
-    print("\nQue desea obtener de la fecha?")
+    print(f"\n{Fore.YELLOW}Que desea obtener de la fecha?")
     print("1. Año")
     print("2. Semestre")
     print("3. Trimestre")
@@ -174,21 +174,21 @@ def extraer_fecha (table_df, table_original):
     opciones = ["1", "2", "3", "4", "5", "6", "7"]
     
     while True:
-        opt = input("\nSelecciona un numero: ")
+        opt = input(f"\n{Fore.CYAN}Selecciona un numero: {Style.RESET_ALL}")
         if opt not in opciones:
-            print("No esta dentro de las opciones")
+            print(f"{Fore.RED}No esta dentro de las opciones")
         else:
             break
     
-    print("\nElige la nueva columna donde se ingresara el dato")
-    print("----Columnas Existentes")
+    print(f"\n{Fore.YELLOW}Elige la nueva columna donde se ingresara el dato")
+    print(f"{Fore.MAGENTA}----Columnas Existentes")
     for column in columnas:
         print(column) 
     
     while True:
-        column_date = input("Ingresa el de la nueva columna: ")
+        column_date = input(f"{Fore.CYAN}Ingresa el nombre de la nueva columna: {Style.RESET_ALL}")
         if column_date in table_original:
-            print("La columna ya existe")
+            print(f"{Fore.RED}La columna ya existe")
         else:
             break
     
@@ -209,22 +209,23 @@ def extraer_fecha (table_df, table_original):
     elif opt == "7":
         table_df[column_date] = table_df.apply(lambda x: "AM" if x[insert_conversion].hour < 12 else "PM", axis=1)
     
+    print(f"{Fore.GREEN}Extracción de fecha completada en '{column_date}'")
     return table_df
 
 
 
 def concatenar_campos (table_df, table_original):
-    print("Porfavor en un ingresa la concatenacion deseada y mete dentro de corchetes [] la tabla deseada")
-    print("----------------Columnas Disponibles ------->")
+    print(f"{Fore.YELLOW}Porfavor en un ingresa la concatenacion deseada y mete dentro de corchetes [] la tabla deseada")
+    print(f"{Fore.MAGENTA}----------------Columnas Disponibles ------->")
     for column in table_original:
         print(column) 
-    concatenacion = input("Ingresala aqui: ")
+    concatenacion = input(f"\n{Fore.CYAN}Ingresala aqui: {Style.RESET_ALL}")
     text_concat = re.split(r"(?=\[)|(?<=\])", concatenacion)
-    column_insert_concat = input("\nIngresa el nombre de la nueva tabla en donde se agregara: ")
+    column_insert_concat = input(f"\n{Fore.CYAN}Ingresa el nombre de la nueva tabla en donde se agregara: {Style.RESET_ALL}")
     
     for column in table_original:
         if column == column_insert_concat:
-            print("La columna ya esta dentro de la base de datos")
+            print(f"{Fore.RED}La columna ya esta dentro de la base de datos")
     
     table_df[column_insert_concat] = ""
     for part in text_concat:
@@ -234,70 +235,66 @@ def concatenar_campos (table_df, table_original):
         else:
             table_df[column_insert_concat] = table_df[column_insert_concat] + part    
     
+    print(f"{Fore.GREEN}Concatenación completada en '{column_insert_concat}'")
     return table_df
 
 
 
 def eliminar_campo(table_df, table_original):
-    print("----------ELIMINAR UNA COLUMNA O CAMPO----------")
-    print("\nColumnas Disponibles a eliminar")
+    print(f"\n{Fore.RED}----------ELIMINAR UNA COLUMNA O CAMPO----------")
+    print(f"\n{Fore.YELLOW}Columnas Disponibles a eliminar")
     columnas_originales = table_original
     columnas = table_df.columns.tolist()
     for columna in columnas:
         if (columna not in columnas_originales):
             print(columna)
     while True:
-        column_delete = input("Seleccciona la columna que sera eliminada o [c] para regresar: ")
+        column_delete = input(f"\n{Fore.CYAN}Seleccciona la columna que sera eliminada o {Fore.YELLOW}[c]{Style.RESET_ALL} para regresar: ")
         #Agregue menu para regresar 
         if column_delete == 'c':
             return table_df
         
         if column_delete not in columnas or column_delete in columnas_originales:
-            print("La columna no existe o no puede ser cambiada")
+            print(f"{Fore.RED}La columna no existe o no puede ser cambiada")
             return table_df   
         else:
             table_df = table_df.drop(columns=[column_delete])
+            print(f"{Fore.GREEN}Columna '{column_delete}' eliminada correctamente.")
             break 
     
     return table_df
 
 
 
-
-
-
-
-
-
 def cambiar_dato(table_df, table_original):
-    print("\nPorfavor seleccione el numero y la columna que desea editar")
+    print(f"\n{Fore.YELLOW}Porfavor seleccione el numero y la columna que desea editar")
     columnas = table_df.columns.tolist()
-    print("----------------Columnas ------->")
+    print(f"{Fore.MAGENTA}----------------Columnas ------->")
     for column in columnas:
         print(column) 
     
     while True:
-        column_conversion = input("\nNombre de la columna: ")
+        column_conversion = input(f"\n{Fore.CYAN}Nombre de la columna: {Style.RESET_ALL}")
         insert_conversion = column_conversion
         is_date_time = pd.to_datetime(table_df[column_conversion], errors='coerce', format='mixed').notna().all()
         
         if column_conversion in table_original:
             if not (is_date_time) or table_df[column_conversion].dtype == 'Int64':
-                print("La columna seleccionada no es un tipo de dato admitido")
+                print(f"{Fore.RED}La columna seleccionada no es un tipo de dato admitido")
                 return table_df;
             else:
-                insert_conversion = input("Escriba el nombre de la nueva columna: ")
+                insert_conversion = input(f"{Fore.CYAN}Escriba el nombre de la nueva columna: {Style.RESET_ALL}")
                 for column in table_original:
                     if column == insert_conversion:
-                        print("La columna ya esta dentro de la base de datos")
+                        print(f"{Fore.RED}La columna ya esta dentro de la base de datos")
                         return table_df
                 break;
         else:
-            print("La columna no existe")
+            print(f"{Fore.RED}La columna no existe")
             return table_df;
     try:
         table_df[insert_conversion] = pd.to_datetime(table_df[column_conversion], format='mixed')
+        print(f"{Fore.GREEN}Tipo de dato cambiado exitosamente en '{insert_conversion}'")
     except Exception as e:
-        print("El formato de tipo string no es posible convertirlo a date")
+        print(f"{Fore.RED}El formato de tipo string no es posible convertirlo a date")
     return table_df
-    
