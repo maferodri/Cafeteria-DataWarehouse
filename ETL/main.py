@@ -5,6 +5,7 @@ from data_destination import seleccionar_destino
 from data_cleaning import limpiar_datos
 from data_conversion import data_conversion
 from data_load import data_load
+from validations import verificar_dimensiones
 from colorama import init, Fore, Style
 
 # COLORES
@@ -15,6 +16,7 @@ def main():
     print(f"{Fore.CYAN}{Style.BRIGHT}           BIENVENIDO AL SISTEMA ETL                   ")
     print(f"{Fore.CYAN}{Style.BRIGHT}=======================================================")
 
+    # Conexión
     while True: 
         sql_password = input(f"{Fore.MAGENTA}Ingresa tu contraseña SQL Server: {Style.RESET_ALL}")
         engine_origen = conexion_oltp(sql_password)
@@ -25,63 +27,80 @@ def main():
             break
         else:
             print(f"{Fore.RED}Contraseña incorrecta. Intente nuevamente")
-    
+
+    # Flujo ETL
     while True: 
-        df_extraccion = extraccion(engine_origen)
+        try:
+            df_extraccion = extraccion(engine_origen)
 
-        if df_extraccion is not None:
+            if df_extraccion is not None:
 
-            while True:
-                tabla_dest, cols_dest = seleccionar_destino(engine_destino)
+                while True:
+                    tabla_dest, cols_dest = seleccionar_destino(engine_destino)
 
-                if not tabla_dest:
-                    break
+                    if not tabla_dest:
+                        break
 
-                df_carga = limpiar_datos(df_extraccion, engine_destino, tabla_dest)
+                    df_carga = limpiar_datos(df_extraccion, engine_destino, tabla_dest)
 
-                if isinstance(df_carga, str) and df_carga == "WRONG_TABLE":
-                    print(f"{Fore.RED}\nPor favor elige una tabla destino compatible.\n")
+                    if isinstance(df_carga, str) and df_carga == "WRONG_TABLE":
+                        print(f"{Fore.RED}\nPor favor elige una tabla destino compatible.\n")
+                        continue
+                    else:
+                        break
+
+                if df_carga is None:
+                    print(f"{Fore.YELLOW}\nNo hay registros nuevos para insertar.")
+                    continuar = input(f"\n{Fore.MAGENTA}¿Desea cargar otra tabla? (s/n): {Style.RESET_ALL}").strip().lower()
+                    if continuar != 's':
+                        print(f'{Fore.GREEN}\nETL finalizado correctamente')
+                        break
+                    else:
+                        continue
+
+                elif isinstance(df_carga, str) and df_carga == "WRONG_TABLE":
                     continue
-                else:
-                    break
 
-            if df_carga is None:
-                print(f"{Fore.YELLOW}\nNo hay registros nuevos para insertar.")
-                continuar = input(f"\n{Fore.MAGENTA}¿Desea cargar otra tabla? (s/n): {Style.RESET_ALL}").strip().lower()
-                if continuar != 's':
-                    print(f'{Fore.GREEN}\nETL finalizado correctamente')
-                    break
                 else:
-                    continue
+                    # Validar dimensiones antes de continuar
+                    if not verificar_dimensiones(engine_destino, tabla_dest):
+                        continuar = input(f"\n{Fore.MAGENTA}¿Desea cargar otra tabla? (s/n): {Style.RESET_ALL}").strip().lower()
+                        if continuar != 's':
+                            print(f'{Fore.GREEN}\nETL finalizado correctamente')
+                            break
+                        else:
+                            continue
 
-            elif isinstance(df_carga, str) and df_carga == "WRONG_TABLE":
-                continue
+                    result = 0
+                    df_mod = df_carga
+                    while result == 0:    
+                        if df_mod is not None:
+                            df_conv = data_conversion(df_mod, df_carga.columns.tolist())
+                            if df_conv is not None:
+                                result, df_mod = data_load(df_conv, tabla_dest, engine_destino)
+
+                    if result == -2:
+                        print(f"{Fore.YELLOW}\nRegresando al Paso 1...")
+                        continue  
+                    elif result == 1:
+                        print(f"{Fore.GREEN}{Style.BRIGHT}\nProceso finalizado exitosamente.")
+                    elif result == -1:
+                        print(f"{Fore.RED}{Style.BRIGHT}\nEl proceso finalizó con errores en la inserción.")
 
             else:
-                result = 0
-                df_mod = df_carga
-                while result == 0:    
-                    if df_mod is not None:
-                        df_conv = data_conversion(df_mod, df_carga.columns.tolist())
-                        if df_conv is not None:
-                            result, df_mod = data_load(df_conv, tabla_dest, engine_destino)
-                
-                if result == -2:
-                    print(f"{Fore.YELLOW}\nRegresando al Paso 1...")
-                    continue  
-                elif result == 1:
-                    print(f"{Fore.GREEN}{Style.BRIGHT}\nProceso finalizado exitosamente.")
-                elif result == -1:
-                    print(f"{Fore.RED}{Style.BRIGHT}\nEl proceso finalizó con errores en la inserción.")
+                break
 
-        else:
-            break
+            continuar = input(f"\n{Fore.MAGENTA}¿Desea cargar otra tabla? (s/n): {Style.RESET_ALL}").strip().lower()
+            if continuar != 's':
+                print(f'{Fore.GREEN}\nETL finalizado correctamente')
+                break
 
-        continuar = input(f"\n{Fore.MAGENTA}¿Desea cargar otra tabla? (s/n): {Style.RESET_ALL}").strip().lower()
-        if continuar != 's':
-            print(f'{Fore.GREEN}\nETL finalizado correctamente')
-            break
-
+        except KeyError as e:
+            print(f"{Fore.RED}Error: La columna {e} no existe, intenta de nuevo.")
+        except ValueError as e:
+            print(f"{Fore.RED}Error de valor: {e}, intenta de nuevo.")
+        except Exception as e:
+            print(f"{Fore.RED}Error inesperado: {e}, intenta de nuevo.")
 
 if __name__ == "__main__":
     main()

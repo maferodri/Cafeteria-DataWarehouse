@@ -2,7 +2,6 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from colorama import Fore, Style, init
 
-# Colores
 init(autoreset=True)
 
 def obtener_conexion(nombre_bd, password):

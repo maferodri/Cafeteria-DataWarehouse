@@ -3,7 +3,6 @@ import re
 from pandas.api.types import is_datetime64_any_dtype
 from colorama import Fore, Style, init
 
-# Colores
 init(autoreset=True)
 
 def data_conversion (table_df, table_original) :
@@ -102,11 +101,9 @@ def conversion_mayuscula (table_df, table_original):
         if column_conversion in table_original:
             if table_df[column_conversion].dtype != "string":
                 print(f"{Fore.RED}La columna seleccionada no es un tipo de dato admitido")
-                #Mafer
                 salir = input(f"¿Desea intentar con otra columna? {Fore.GREEN}[s]{Style.RESET_ALL} o regresar al menu {Fore.YELLOW}[c]{Style.RESET_ALL}: ")
                 if salir == 'c':
                     return table_df
-                #return;
             else:
                 break;
         else:
@@ -136,13 +133,16 @@ def extraer_fecha (table_df, table_original):
     
     while True:
         column_conversion = input(f"\n{Fore.CYAN}Nombre de la columna: {Style.RESET_ALL}")
-        insert_conversion = column_conversion
-        is_date_time = pd.to_datetime(table_df[column_conversion], errors='coerce', format='mixed').notna().all()
+        try: 
+            insert_conversion = column_conversion
+            is_date_time = pd.to_datetime(table_df[column_conversion], errors='coerce', format='mixed').notna().all()
+        except KeyError:
+            print(f"{Fore.RED}La columna '{column_conversion}' no existe, vuelva a ingresar el nombre.")
+            continue
         
         if column_conversion in table_original:
             if not (is_date_time) or table_df[column_conversion].dtype == 'Int64':
                 print(f"{Fore.RED}La columna seleccionada no es un tipo de dato admitido")
-                #Mafer
                 salir = input(f"¿Desea intentar con otra columna? {Fore.GREEN}[s]{Style.RESET_ALL} o regresar al menu {Fore.YELLOW}[c]{Style.RESET_ALL}: ")
                 if salir == 'c':
                     return table_df
@@ -213,7 +213,7 @@ def extraer_fecha (table_df, table_original):
 def concatenar_campos (table_df, table_original):
     print(f"{Fore.YELLOW}Ingrese la expresión de concatenación y asegúrese de encerrar el nombre de la tabla entre corchetes [Nombre_Tabla] para identificar el origen.")
     print(f"{Fore.MAGENTA}----------------Columnas Disponibles ------->")
-    for column in table_original:
+    for column in table_df.columns:
         print(column) 
     concatenacion = input(f"\n{Fore.CYAN}Ingresala aqui: {Style.RESET_ALL}")
     text_concat = re.split(r"(?=\[)|(?<=\])", concatenacion)
@@ -227,9 +227,11 @@ def concatenar_campos (table_df, table_original):
     for part in text_concat:
         if "[" in part and "]" in part:
             column_exist = part.replace("[", "").replace("]","")
-            table_df[column_insert_concat] = table_df[column_insert_concat] + table_df[column_exist].astype(str)
+            table_df[column_insert_concat] = table_df[column_insert_concat] + table_df[column_exist].astype(str) + " "
         else:
-            table_df[column_insert_concat] = table_df[column_insert_concat] + part    
+            table_df[column_insert_concat] = table_df[column_insert_concat] + part 
+
+    table_df[column_insert_concat] = table_df[column_insert_concat].str.strip()   
     
     print(f"{Fore.GREEN}Concatenación completada en '{column_insert_concat}'")
     return table_df

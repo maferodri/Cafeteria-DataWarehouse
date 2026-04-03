@@ -49,20 +49,20 @@ def data_load(df_conv, table_destination, engine):
             while True:
                 #Mafer: cuando no esta la columa para emparejar regresar a la conversion no nos sirve, 
                 #lo que nos sirve es dejarlo en null o volver al paso 1. 
-                print(f"\nElija la columna para {Fore.GREEN}{column}{Style.RESET_ALL} o presiona {Fore.YELLOW}[s]{Style.RESET_ALL} para dejar en NULL, {Fore.YELLOW}[c]{Style.RESET_ALL} para regresar al paso 1")
-                col_select = input(f"{Fore.CYAN}Ingrese el nombre: ")
+                print(f"\nElija la columna para {Fore.GREEN}{column}{Style.RESET_ALL}, {Fore.YELLOW}[s]{Style.RESET_ALL} para regresar al menu de transformaciones o {Fore.YELLOW}[c]{Style.RESET_ALL} para regresar al paso 1")
+                col_select = input(f"{Fore.CYAN}Ingrese el nombre: ").strip()
                 if col_select == 'c':
                     print(f'{Fore.RED}--------------REGRESANDO AL PASO 1----------------')
                     return -2, df_conv
-                if col_select == 's':
-                    print(f"{Fore.YELLOW}{column} quedará como NULL")
-                    df_final[column] = None
-                    column_pair.append('NULL')
-                    break
-                if col_select not in columns_conv:
-                    print(f"{Fore.RED}No existe esa columna")
-                else:
+                
+                elif col_select == 's':
+                    print(f'{Fore.YELLOW}--------------REGRESANDO AL MENU DE TRANSFORMACIÓN----------------')
+                    return 0, df_conv
 
+                elif col_select not in columns_conv:
+                    print(f"{Fore.RED}No existe esa columna")
+
+                else:
                     insp_col = columns_inspector[column];
 
                     #Verificacion de datos entre SQL Server y los DataFrames ------------------
