@@ -59,7 +59,7 @@ def extraccion(engine_oltp):
                     df = pd.read_sql(query, engine_oltp)
 
                     if not df.empty:
-                        print(f"\n{Fore.GREEN}Datos extraídos exitosamente. Los primeros 5 fueron: ")
+                        print(f"\n{Fore.GREEN}Datos extraídos exitosamente. Los primeros 5 registros fueron: ")
                         print(f"\n {df.head()}")
                         datos = len(df)
                         print(f"\nLa cantidad de datos obtenidos fueron: {Fore.GREEN}{datos}")
@@ -84,7 +84,7 @@ def extraccion(engine_oltp):
                     print("\nOpciones: ")
                     print(f"{Fore.YELLOW}0. Menú Principal")
 
-                    volver = input(f"Si deseas volver al menu principal presiona {Fore.YELLOW}0{Style.RESET_ALL}, de lo contrario cualquier tecla: ")
+                    volver = input(f"Si deseas volver al menu principal presiona {Fore.YELLOW}0{Style.RESET_ALL}, de lo contrario presiona cualquier tecla: ")
 
                     if volver == '0':
                         break
@@ -127,7 +127,7 @@ def extraccion(engine_oltp):
                     try:
                         query_final = f"SELECT {campos_validados} FROM {tabla_seleccionada}"
                         df = pd.read_sql(query_final, engine_oltp)
-                        print(f"\n{Fore.GREEN}Datos de '{tabla_seleccionada}' extraídos exitosamente. Los primeros 5 datos: ")
+                        print(f"\n{Fore.GREEN}Datos de '{tabla_seleccionada}' extraídos exitosamente. Los primeros 5 registros datos: ")
                         print(f"\n {df.head()}")
                         print(f"\nLa cantidad de datos obtenidos fueron: {Fore.GREEN}{len(df)}")
                         return df 

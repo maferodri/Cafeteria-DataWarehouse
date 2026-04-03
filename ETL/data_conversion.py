@@ -54,7 +54,7 @@ def data_conversion (table_df, table_original) :
     
     
 def conversion_minuscula (table_df, table_original):
-    print(f"\n{Fore.YELLOW}Porfavor seleccione el numero de la columna que desea editar")
+    print(f"\n{Fore.YELLOW}Porfavor seleccione el nombre de la columna que desea editar")
     columnas = table_df.columns.tolist()
     print(f"{Fore.MAGENTA}----------------Columnas ------->")
     for column in columnas:
@@ -75,7 +75,7 @@ def conversion_minuscula (table_df, table_original):
             print(f"{Fore.RED}La columna no existe")
     
     while True:
-        column_add = input(f"{Fore.CYAN}Escriba el nombre de la nueva tabla en donde se guardaran los datos: {Style.RESET_ALL}")
+        column_add = input(f"{Fore.CYAN}Se requiere una columna de destino para procesar los registros. Escriba el nombre de la nueva columna:  {Style.RESET_ALL}")
         if column_add in table_original:
             print(f"{Fore.RED}Ya existe una tabla con ese nombre")
         else:
@@ -90,7 +90,7 @@ def conversion_minuscula (table_df, table_original):
 
 
 def conversion_mayuscula (table_df, table_original):
-    print(f"\n{Fore.YELLOW}Porfavor seleccione el numero de la columna que desea editar")
+    print(f"\n{Fore.YELLOW}Porfavor seleccione el nombre de la columna que desea editar")
     columnas = table_df.columns.tolist()
     print(f"{Fore.MAGENTA}----------------Columnas ------->")
     for column in columnas:
@@ -113,9 +113,9 @@ def conversion_mayuscula (table_df, table_original):
             print(f"{Fore.RED}La columna no existe")
     
     while True:
-        column_add = input(f"{Fore.CYAN}Escriba el nombre de la nueva tabla en donde se guardaran los datos: {Style.RESET_ALL}")
+        column_add = input(f"{Fore.CYAN}Se requiere una columna de destino para procesar los registros. Escriba el nombre de la nueva columna:  {Style.RESET_ALL}")
         if column_add in table_original:
-            print(f"{Fore.RED}Ya existe una tabla con ese nombre")
+            print(f"{Fore.RED}Ya existe una columna con ese nombre")
         else:
             break;
     
@@ -211,13 +211,13 @@ def extraer_fecha (table_df, table_original):
 
 
 def concatenar_campos (table_df, table_original):
-    print(f"{Fore.YELLOW}Porfavor en un ingresa la concatenacion deseada y mete dentro de corchetes [] la tabla deseada")
+    print(f"{Fore.YELLOW}Ingrese la expresión de concatenación y asegúrese de encerrar el nombre de la tabla entre corchetes [Nombre_Tabla] para identificar el origen.")
     print(f"{Fore.MAGENTA}----------------Columnas Disponibles ------->")
     for column in table_original:
         print(column) 
     concatenacion = input(f"\n{Fore.CYAN}Ingresala aqui: {Style.RESET_ALL}")
     text_concat = re.split(r"(?=\[)|(?<=\])", concatenacion)
-    column_insert_concat = input(f"\n{Fore.CYAN}Ingresa el nombre de la nueva tabla en donde se agregara: {Style.RESET_ALL}")
+    column_insert_concat = input(f"\n{Fore.CYAN}Ingresa el nombre de la nueva columna en donde se agregara: {Style.RESET_ALL}")
     
     for column in table_original:
         if column == column_insert_concat:

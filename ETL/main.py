@@ -21,7 +21,7 @@ def main():
         engine_destino = conexion_olap(sql_password)
 
         if engine_origen and engine_destino:
-            print(f"{Fore.GREEN} Conexión establecida con éxito.\n")
+            print(f"{Fore.GREEN}CONEXION ESTABLECIDA CON EXITO.\n")
             break
         else:
             print(f"{Fore.RED}Contraseña incorrecta. Intente nuevamente")
@@ -49,7 +49,7 @@ def main():
                 print(f"{Fore.YELLOW}\nNo hay registros nuevos para insertar.")
                 continuar = input(f"\n{Fore.MAGENTA}¿Desea cargar otra tabla? (s/n): {Style.RESET_ALL}").strip().lower()
                 if continuar != 's':
-                    print(f'{Fore.GREEN}\nEl ETL finalizado correctamente')
+                    print(f'{Fore.GREEN}\nETL finalizado correctamente')
                     break
                 else:
                     continue
@@ -79,7 +79,7 @@ def main():
 
         continuar = input(f"\n{Fore.MAGENTA}¿Desea cargar otra tabla? (s/n): {Style.RESET_ALL}").strip().lower()
         if continuar != 's':
-            print(f'{Fore.GREEN}\nEl ETL finalizado correctamente')
+            print(f'{Fore.GREEN}\nETL finalizado correctamente')
             break
 
 
