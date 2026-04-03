@@ -7,7 +7,7 @@ init(autoreset=True)
 
 def obtener_conexion(nombre_bd, password):
     try:
-        server = 'localhost\\SQLEXPRESS' 
+        server = 'localhost,1433' 
         username = 'sa'
 
         print(f"{Fore.CYAN}Intentando conectar a la base de datos: {nombre_bd}...")

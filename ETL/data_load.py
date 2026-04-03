@@ -64,17 +64,10 @@ def data_load(df_conv, table_destination, engine):
                 else:
 
                     insp_col = columns_inspector[column];
-                    # print(insp_col['type'])
-                    # print(df_conv[col_select].dtype)
 
                     #Verificacion de datos entre SQL Server y los DataFrames ------------------
                     
                     #Verificacion de Fechas
-
-                    #tipos_permitidos = ['object', 'datetime64[ns]']
-                    #if ('DATE' in str(insp_col['type']).upper()) and (df_conv[col_select].dtype not in tipos_permitidos):
-                        #print("El tipo de datos no coincide")
-                        #continue
 
                     #Mafer 
                     if 'DATE' in str(insp_col['type']).upper():

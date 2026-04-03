@@ -69,7 +69,6 @@ def conversion_minuscula (table_df, table_original):
                 salir = input(f"¿Desea intentar con otra columna? {Fore.GREEN}[s]{Style.RESET_ALL} o regresar al menu {Fore.YELLOW}[c]{Style.RESET_ALL}: ")
                 if salir == 'c':
                     return table_df
-                #return
             else:
                 break;
         else:
@@ -170,7 +169,6 @@ def extraer_fecha (table_df, table_original):
     print("6. hora")
     print("7. AM o PM")
     
-    #Mafer: Agregue el 7 a las opciones para que funcione
     opciones = ["1", "2", "3", "4", "5", "6", "7"]
     
     while True:
@@ -195,12 +193,10 @@ def extraer_fecha (table_df, table_original):
     if opt == "1":
         table_df[column_date] = table_df[insert_conversion].dt.year
     elif opt == "2":
-        #Mafer: se usaba una variable que no existe aun
         table_df[column_date] = (table_df[insert_conversion].dt.quarter - 1) // 2 + 1
     elif opt == "3":
         table_df[column_date] = table_df[insert_conversion].dt.quarter
     elif opt == "4":
-        #Mafer: en la BD tenemos el mes como integer 
         table_df[column_date] = table_df[insert_conversion].dt.month
     elif opt == "5":
         table_df[column_date] = table_df[insert_conversion].dt.day
@@ -250,7 +246,6 @@ def eliminar_campo(table_df, table_original):
             print(columna)
     while True:
         column_delete = input(f"\n{Fore.CYAN}Seleccciona la columna que sera eliminada o {Fore.YELLOW}[c]{Style.RESET_ALL} para regresar: ")
-        #Agregue menu para regresar 
         if column_delete == 'c':
             return table_df
         
